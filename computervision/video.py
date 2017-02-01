@@ -24,6 +24,16 @@ def save_image(frame):
         print 'Could not write file'
 
 def start_video_stream(grayScale=True, sound=False):
+
+    play_sound('click.wav')
+    random_integer = np.random.randint(100000)
+    filename = 'images/snapshot' + str(random_integer) + '.png'
+    print 'Writing file: {}'.format(filename)
+    cv2.imwrite(filename, frame)
+    
+
+def start_video_stream(grayScale=True):
+
     cap = cv2.VideoCapture(0)
     while True:
         ret, frame = cap.read()
@@ -32,8 +42,10 @@ def start_video_stream(grayScale=True, sound=False):
 
         cv2.imshow('frame', frame)
         if cv2.waitKey(1) & 0xFF == ord('s'):
+
             if sound:
                 play_sound('click.wav')
+
             cv2.imshow('Snapshot', frame)
             save_image(frame)
         elif cv2.waitKey(1) & 0xFF == ord('q'):
@@ -42,6 +54,7 @@ def start_video_stream(grayScale=True, sound=False):
     cap.release()
     cv2.destroyAllWindows()
     pass
+
 
 def take_snapshot(grayScale=True, sound=False):
     cap= cv2.VideoCapture(0)
@@ -57,3 +70,8 @@ def take_snapshot(grayScale=True, sound=False):
 if __name__ == '__main__':
     start_video_stream(False)
     #take_snapshot()
+
+    
+if __name__ == '__main__':
+    start_video_stream(False)
+
