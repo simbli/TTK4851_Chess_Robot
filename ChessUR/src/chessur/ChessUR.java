@@ -13,14 +13,14 @@ public class ChessUR {
     /*
     Here we can set the ip-adress and port to the UR5
      */
-    static String serverUR = "192.168.0.103";
+    static String serverUR = "192.168.0.3";
     static int portUR = 30002;
 
     /*
     Here we can set the ip-address and port for the PC
     (currently not in use, will implement at a later point)
      */
-    static String serverPC = "192.168.0.102";
+    static String serverPC = "192.168.0.2";
     static int portPC = 29999;
 
     /*
@@ -85,7 +85,7 @@ public class ChessUR {
 
         String scriptToWrite;
 
-        scriptToWrite = scriptUR.handshakeDynamic(a, v);
+        scriptToWrite = scriptUR.pickUpTest();
 //        scriptToWrite = scriptUR.HandEyeCoordination(a, v);
 //        scriptToWrite = scriptUR.test(a, v);
 //        scriptToWrite = scriptUR.BallPull(a, v);
