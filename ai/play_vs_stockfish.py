@@ -8,7 +8,7 @@ stockfish = Stockfish()
 moves = []
 
 while True:
-	moves.append(input("Next Move:"))
+	moves.append(raw_input("Next Move:"))
 	stockfish.set_position(moves)
 	board.push(chess.Move.from_uci(moves[len(moves)-1]))
 
@@ -17,5 +17,5 @@ while True:
 	stockfish.set_position(moves)
 	board.push(chess.Move.from_uci(moves[len(moves)-1]))
 
-	print("computer made move:",moves[len(moves)-1])
-	print(board)
+	print "computer made move:",moves[len(moves)-1]
+	print board 
