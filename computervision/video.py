@@ -32,9 +32,9 @@ def start_video_stream(grayScale=True, sound=False):
     cv2.imwrite(filename, frame)
     
 
-def start_video_stream(grayScale=True):
+def start_video_stream(grayScale=True, sound=False):
 
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
     while True:
         ret, frame = cap.read()
         if grayScale:
