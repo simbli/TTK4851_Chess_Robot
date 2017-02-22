@@ -22,8 +22,9 @@ def main():
 		move = ai.get_move_stockfish()
 
 		#send move to robot
-		#send_move(move)
+		send_move(move)
 
 
 if __name__ == "__main__":
 	main()
+	

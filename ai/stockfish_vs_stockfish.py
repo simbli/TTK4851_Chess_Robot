@@ -26,5 +26,4 @@ while True:
 	print "deep AI made move:",moves[len(moves)-1]
 	print board 
 	print
-	print
 	time.sleep(3)
