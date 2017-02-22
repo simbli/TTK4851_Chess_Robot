@@ -43,7 +43,6 @@ public class RocketfarmUpload {
 
         // acceleration and velocity
         a = 0.4;
-        
         v = 0.1;
         //  Safe positions
         x1 = 0.2;

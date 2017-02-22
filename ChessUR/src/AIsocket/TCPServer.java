@@ -81,7 +81,7 @@ public class TCPServer {
 
     private static int getInt(char c){
         if (Character.isLetter(c)) return c-'a';
-        else return c-'1';
+        else return 7-(c-'1');
     }
 
 
@@ -89,7 +89,7 @@ public class TCPServer {
         int i = 0;
         while (i < 10){
             System.out.println("i: "+i);
-            System.out.println(convertCoordinates("e2e4"));
+            System.out.println(convertCoordinates("c3c3"));
             i++;
 
         }

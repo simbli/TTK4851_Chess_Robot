@@ -83,9 +83,11 @@ public class ChessUR {
         LibraryURscript scriptUR = new LibraryURscript(serverPC, portPC);
 
         String scriptToWrite;
-
+        while(true){
         scriptToWrite = scriptUR.moveChessPiece(TCPServer.getNextMove());
-//        scriptToWrite = scriptUR.pickUpTest();
+//        scriptToWrite = scriptUR.test();
+        
+//        scriptToWrite = scriptUR.pickUpTest();  TCPServer.getNextMove()
 //        scriptToWrite = scriptUR.HandEyeCoordination(a, v);
 //        scriptToWrite = scriptUR.test(a, v);
 //        scriptToWrite = scriptUR.BallPull(a, v);
@@ -97,8 +99,9 @@ public class ChessUR {
          */
         client.connectUR();
         client.sendScriptToUR(scriptToWrite);
-        coordinateThread.start();
-
+        System.out.println("-----------------------------------------------------");
+//        coordinateThread.start();
+        }
     }
 
 }
