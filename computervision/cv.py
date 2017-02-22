@@ -16,7 +16,7 @@ class Compvision():
         if snapshot == None:
             snapshot = take_snapshot()
         self.prev_board = get_board(snapshot)
-        self.board_to_compare = get_board(snapshot)
+        self.board_to_compare = None
     #Takes a new snapshot, and compares the previous one with the new, gives out a move
     def get_move(self):
         #Code here will be added

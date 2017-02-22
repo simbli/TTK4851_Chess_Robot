@@ -4,7 +4,7 @@ import pygame
 
 #Sets up videostream from video source 0.
 #Press s to take snapshot
-#Press q to quit 
+#Press q to quit
 
 def play_sound(filename):
     pygame.init()
@@ -23,6 +23,7 @@ def save_image(frame):
     except:
         print 'Could not write file'
 
+"""
 def start_video_stream(grayScale=True, sound=False):
 
     play_sound('click.wav')
@@ -30,9 +31,9 @@ def start_video_stream(grayScale=True, sound=False):
     filename = 'images/snapshot' + str(random_integer) + '.png'
     print 'Writing file: {}'.format(filename)
     cv2.imwrite(filename, frame)
-    
+"""
 
-def start_video_stream(grayScale=True, sound=False):
+def start_video_stream(grayScale=False, sound=False):
 
     cap = cv2.VideoCapture(1)
     while True:
@@ -50,28 +51,20 @@ def start_video_stream(grayScale=True, sound=False):
             save_image(frame)
         elif cv2.waitKey(1) & 0xFF == ord('q'):
             break
-        
+
     cap.release()
     cv2.destroyAllWindows()
     pass
 
 
-def take_snapshot(grayScale=True, sound=False):
-    cap= cv2.VideoCapture(0)
+def get_frame(grayScale=False):
+    cap= cv2.VideoCapture(1)
     ret, frame = cap.read()
     if grayScale:
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    cv2.imshow('SNAPSHOT', frame)
+    cap.release()
+    cv2.destroyAllWindows()
+    return frame
 
-    play_sound('click.wav')
-    save_image(frame)
-    cv2.waitKey(0)
-    
 if __name__ == '__main__':
-    start_video_stream(False)
-    #take_snapshot()
-
-    
-if __name__ == '__main__':
-    start_video_stream(False)
-
+    start_video_stream()
