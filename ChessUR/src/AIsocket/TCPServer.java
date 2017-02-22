@@ -2,10 +2,11 @@ package AIsocket;
 
 import java.net.*;
 import java.io.*;
+import java.util.Arrays;
 
 public class TCPServer {
 
-    public static String getNextMove() {
+    public static int[] getNextMove() {
 
 
         ServerSocket serverSocket = null;
@@ -33,7 +34,8 @@ public class TCPServer {
 
         System.out.println ("Connection successful");
         System.out.println ("Waiting for input.....");
-        String inputLine = "";
+        String inputLine;
+        String outPut = "";
 
         try{
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(),
@@ -46,6 +48,7 @@ public class TCPServer {
             {
                 System.out.println ("Server: " + inputLine);
                 out.println(inputLine);
+                outPut = inputLine;
 
             }
 
@@ -60,13 +63,36 @@ public class TCPServer {
         }
 
 
-        return inputLine;
+        return convertCoordinates(outPut);
 
 
     }
 
+    private static int[] convertCoordinates(String move){
+        int[] ar = new int[4];
+        System.out.println("MOVE "+ move);
+        for (int i = 0; i < move.length(); i++) {
+            ar[i] = getInt(move.charAt(i));
+        }
+        return ar;
+    }
+
+    private static int getInt(char c){
+        if (Character.isLetter(c)) return c-'a';
+        else return c-'1';
+    }
+
+
     public static void main(String[] args) {
-        TCPServer.getNextMove();
+        int i = 0;
+        while (i < 10){
+            System.out.println("i: "+i);
+            System.out.println(Arrays.toString(TCPServer.getNextMove()));
+            i++;
+
+        }
+
+
     }
 
 
