@@ -30,8 +30,9 @@ public class RocketfarmUpload {
 //        String scriptFile = "handshake_v3.script"; // ball_pull_v2  handshake_v2
 
         String filePath = "F:/GitHub/EiT_chess_robot/URscript/";
-        String scriptFile = "pickUpTest.script"; //handshake_v3
-
+//       String scriptFile = "palletTest.script"; 
+//        String scriptFile = "pickUpTest.script";
+        String scriptFile = "xyMove.script";
         
 //        Scanner input = new Scanner(System.in);
 //        String choice;

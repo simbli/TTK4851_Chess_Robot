@@ -1,5 +1,6 @@
 package chessur;
 
+import AIsocket.TCPServer;
 import chessur.LibraryURscript;
 import socket.Coordinates;
 import socket.URsocket;
@@ -78,14 +79,13 @@ public class ChessUR {
 
         /*
         Create a new object from our Libary of URScripts.
-        */
-        LibraryURscript scriptUR = new LibraryURscript(serverPC,portPC);
-     
-
+         */
+        LibraryURscript scriptUR = new LibraryURscript(serverPC, portPC);
 
         String scriptToWrite;
 
-        scriptToWrite = scriptUR.pickUpTest();
+        scriptToWrite = scriptUR.moveChessPiece(TCPServer.getNextMove());
+//        scriptToWrite = scriptUR.pickUpTest();
 //        scriptToWrite = scriptUR.HandEyeCoordination(a, v);
 //        scriptToWrite = scriptUR.test(a, v);
 //        scriptToWrite = scriptUR.BallPull(a, v);
@@ -94,7 +94,7 @@ public class ChessUR {
         Try to connect to the UR, then it will send the chosen URScript to UR.
         It will also start to listen on port 30002. The UR will send joint
         positions and coordinations back to Java.
-        */
+         */
         client.connectUR();
         client.sendScriptToUR(scriptToWrite);
         coordinateThread.start();

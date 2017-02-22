@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 public class TCPServer {
 
-    public static int[] getNextMove() {
+    public static String getNextMove() {
 
 
         ServerSocket serverSocket = null;
@@ -68,13 +68,15 @@ public class TCPServer {
 
     }
 
-    private static int[] convertCoordinates(String move){
-        int[] ar = new int[4];
-        System.out.println("MOVE "+ move);
-        for (int i = 0; i < move.length(); i++) {
-            ar[i] = getInt(move.charAt(i));
+    private static String convertCoordinates(String move){
+        String str = "["+getInt(move.charAt(0));
+        
+        for (int i = 1; i < move.length(); i++) {
+            str+=", " + getInt(move.charAt(i));
         }
-        return ar;
+        
+        str+="]";
+        return str;
     }
 
     private static int getInt(char c){
@@ -87,7 +89,7 @@ public class TCPServer {
         int i = 0;
         while (i < 10){
             System.out.println("i: "+i);
-            System.out.println(Arrays.toString(TCPServer.getNextMove()));
+            System.out.println(convertCoordinates("e2e4"));
             i++;
 
         }
