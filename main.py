@@ -11,7 +11,7 @@ def send_move(move):
 def main():
 	ai = artint.AI()
 
-	while(True):
+	while True:
 		#get move made by the player from computer vision
 		move = raw_input("Next Move:")
 

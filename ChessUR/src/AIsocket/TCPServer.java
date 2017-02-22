@@ -1,35 +1,73 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package AIsocket;
 
-/**
- *
- * @author Børge
- */
-import java.io.*;
 import java.net.*;
+import java.io.*;
 
-class TCPServer
-{
-   public static void main(String argv[]) throws Exception
-      {
-         String clientSentence;
-         String capitalizedSentence;
-         ServerSocket welcomeSocket = new ServerSocket(5000);
+public class TCPServer {
 
-         while(true)
-         {
-            Socket connectionSocket = welcomeSocket.accept();
-            BufferedReader inFromClient =
-               new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
-            DataOutputStream outToClient = new DataOutputStream(connectionSocket.getOutputStream());
-            clientSentence = inFromClient.readLine();
-            System.out.println("Received: " + clientSentence);
-            capitalizedSentence = clientSentence.toUpperCase() + '\n';
-            outToClient.writeBytes(capitalizedSentence);
-         }
-      }
-}
+    public static String getNextMove() {
+
+
+        ServerSocket serverSocket = null;
+
+        try {
+            serverSocket = new ServerSocket(5005);
+        }
+        catch (IOException e)
+        {
+            System.err.println("Could not listen on port: 5005.");
+            System.exit(1);
+        }
+
+        Socket clientSocket = null;
+        System.out.println ("Waiting for connection.....");
+
+        try {
+            clientSocket = serverSocket.accept();
+        }
+        catch (IOException e)
+        {
+            System.err.println("Accept failed.");
+            System.exit(1);
+        }
+
+        System.out.println ("Connection successful");
+        System.out.println ("Waiting for input.....");
+        String inputLine = "";
+
+        try{
+            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(),
+                    true);
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader( clientSocket.getInputStream()));
+
+
+            while ((inputLine = in.readLine()) != null)
+            {
+                System.out.println ("Server: " + inputLine);
+                out.println(inputLine);
+
+            }
+
+
+            out.close();
+            in.close();
+            clientSocket.close();
+            serverSocket.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        return inputLine;
+
+
+    }
+
+    public static void main(String[] args) {
+        TCPServer.getNextMove();
+    }
+
+
+} 
