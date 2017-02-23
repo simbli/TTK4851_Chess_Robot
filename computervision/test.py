@@ -66,7 +66,7 @@ def createBoardMatrix(frame):
 
     #lower right
     for i in range(2):
-        board[matSize -1][matSize - 1][i] = np.round(corners[internalCorners - 1][0][i] + squareSize)
+        board[matSize - 1][matSize - 1][i] = np.round(corners[internalCorners - 1][0][i] + squareSize)
 
     #Upper row
     for i in range(1, matSize - 1):
@@ -77,6 +77,25 @@ def createBoardMatrix(frame):
     for i in range(1, matSize - 1):
         board[matSize - 1][i][0] = np.round(corners[internalCorners * (internalCorners - i + 1) - 1][0][0])
         board[matSize - 1][i][1] = np.round(corners[internalCorners * (internalCorners - i + 1) - 1][0][1] + squareSize)
+
+    #left column
+    for i in range(1, matSize - 1):
+        cornerIndex = internalCorners * (internalCorners - 1) + i - 1
+        board[i][0][0] = np.round(corners[cornerIndex][0][0] - squareSize)
+        board[i][0][1] = np.round(corners[cornerIndex][0][1])
+
+    #right column
+    for i in range(1, matSize - 1):
+        cornerIndex = i - 1
+        board[i][matSize - 1][0] = np.round(corners[cornerIndex][0][0] + squareSize)
+        board[i][matSize - 1][1] = np.round(corners[cornerIndex][0][1])
+
+    #internal corners
+    for i in range(1, matSize-1):
+        for j in range(1, matSize-1):
+            cornerIndex = internalCorners * (internalCorners - j) + i - 1
+            board[i][j][0] = np.round(corners[cornerIndex][0][0])
+            board[i][j][1] = np.round(corners[cornerIndex][0][1])
 
     print board
 
