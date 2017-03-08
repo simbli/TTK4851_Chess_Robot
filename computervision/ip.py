@@ -1,9 +1,12 @@
 import cv2
 import sys
-from video import get_frame
+#from video import get_frame
 import numpy as np
 import math
 #image = get_frame()
+
+def get_frame():
+    return cv2.imread(sys.argv[1],1)
 
 
 def findSquareSize(frame, corners):
@@ -71,16 +74,18 @@ def print_corner(image, board):
     cv2.waitKey(0)
 
 
-def calibrate(frame):
+def calibrate(frame=None):
     calibrated = False
     while not calibrated:
         print 'Starting calibration iteration'
-        #frame = get_frame()
+        if frame == None:
+            frame = get_frame()
         found, corners = cv2.findChessboardCorners(frame, (7,7))#, flags=cv2.cv.CV_CALIB_CB_ADAPTIVE_THRESH)
         if found and len(corners) == 49:
             calibrated = True
+            boundaries = createBoardMatrix(frame)
     print 'Calibration complete'
-    return True
+    return boundaries
 
 def getCentroid(contour):
     M = cv2.moments(contour)
@@ -164,7 +169,6 @@ if __name__ == '__main__':
     calibration_image = openAndInitializeImage(calibration_image_filename)
     chessboard_image = openAndInitializeImage(chessboard_image_filename)
 
-    if calibrate(calibration_image):
-        boundaries = createBoardMatrix(calibration_image)
-        res = getRepresentation(boundaries, chessboard_image)
-        print res
+    boundaries = calibrate(calibration_image)
+    res = getRepresentation(boundaries, chessboard_image)
+    print res
