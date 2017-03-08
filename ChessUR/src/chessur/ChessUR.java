@@ -42,40 +42,14 @@ public class ChessUR {
     Here we can choose if we want to send the file or following script to robot
     true sends string script, false sends file
      */
-    static boolean choice = true;       //  currently not in use
-
-    /*
-    Positions for UR
-    These are tested and it is safe for the UR to move into these positions
-     */
-    static double x1 = 0.1;
-    static double y1 = 0.4;
-    static double z1 = 0.7;
-    static double rx = 3.1415;
-    static double ry = 0.0;
-    static double rz = 0.0;
-
-    /*
-    Example of two different ways to move the robot. These are the same waypoints
-    using two different ways to determine where and how UR will move
-     */
-    static String scriptMovement
-            = "def scriptmovement():\n"
-            + " textmsg(\"Starting script from String\")\n"
-            + " movej(p[" + x1 + ", " + y1 + "," + z1 + "," + rx + "," + ry + "," + rz + "]," + v + "," + a + ")\n"
-            + "end";
-    static String moveHome
-            = "= def moveHome():\n"
-            + " movej([4.19949825862993,-1.5307928265838344,0.7768978331470714,-0.816820601535465,-1.570841791732095,-0.512890719912271]," + a + "," + v + ")\n"
-            + "end";
-    static char in;
-
+//    static boolean choice = true;       //  currently not in use
     public static void main(String[] args) {
         /*
         Create new object and send the ip and port to class URsocket
          */
         URsocket client = new URsocket(serverUR, portUR);
-        Thread coordinateThread = new Thread((Runnable) new Coordinates());
+        Coordinates crd = new Coordinates();
+        Thread coordinateThread = new Thread((Runnable) crd);
 
         /*
         Create a new object from our Libary of URScripts.
@@ -83,24 +57,27 @@ public class ChessUR {
         LibraryURscript scriptUR = new LibraryURscript(serverPC, portPC);
 
         String scriptToWrite;
-        while(true){
-        scriptToWrite = scriptUR.moveChessPiece(TCPServer.getNextMove());
-//        scriptToWrite = scriptUR.test();
-        
-//        scriptToWrite = scriptUR.pickUpTest();  TCPServer.getNextMove()
-//        scriptToWrite = scriptUR.HandEyeCoordination(a, v);
-//        scriptToWrite = scriptUR.test(a, v);
-//        scriptToWrite = scriptUR.BallPull(a, v);
 
-        /*
-        Try to connect to the UR, then it will send the chosen URScript to UR.
-        It will also start to listen on port 30002. The UR will send joint
-        positions and coordinations back to Java.
-         */
-        client.connectUR();
-        client.sendScriptToUR(scriptToWrite);
-        System.out.println("-----------------------------------------------------");
-//        coordinateThread.start();
+        // Finn ut av dette........
+        while (crd.getStatusUR() == 1) {
+            System.out.println("Status UR: Running script");
+        }
+        int i = 0;
+        while (true) {
+            //Get's script to be sendt
+            scriptToWrite = scriptUR.moveChessPiece(TCPServer.getNextMove());
+            /*
+            Try to connect to the UR, then it will send the chosen URScript to UR.
+            It will also start to listen on port 30002. The UR will send joint
+            positions and coordinations back to Java.
+             */
+            client.connectUR();
+            client.sendScriptToUR(scriptToWrite);
+            System.out.println("-----------------------------------------------------");
+            if (i == 0) {
+                coordinateThread.start();
+            }
+            i++;
         }
     }
 

@@ -21,6 +21,12 @@ public class Coordinates implements Runnable {
     InputStream fromServer;
     DataInputStream in;
 
+    int statusUR;
+
+    public int getStatusUR() {
+        return statusUR;
+    }
+
     @Override
     public void run() {
         final int MAX = 10000;
@@ -47,7 +53,7 @@ public class Coordinates implements Runnable {
             if (size > 0) {
                 /*
                 Here we do something that seem to work
-                */
+                 */
                 for (int i = 0; i < size; i++) {
                     buf_net[index++] = b[i];
                 }
@@ -60,10 +66,10 @@ public class Coordinates implements Runnable {
                     }
 
                     index = index - size;
-                    
+
                     /*
                     Here we wrap a byte array into a buffer
-                    */
+                     */
                     ByteBuffer bb = ByteBuffer.wrap(b);
                     int sizenew = bb.getInt(0);
 
@@ -85,19 +91,19 @@ public class Coordinates implements Runnable {
                         double rxp = bb.getDouble(314);
                         double ryp = bb.getDouble(322);
                         double rzp = bb.getDouble(330);
-
-                        System.out.println("movej(");
-                        System.out.println("[" + x1norm + "," + y1norm + "," + z1norm + "," + rxnorm + "," + rynorm + "," + rznorm + "]");
-                        System.out.println("");
-                        System.out.println("movej(p[");
-                        System.out.println("[" + x1p + "," + y1p + "," + z1p + "," + rxp + "," + ryp + "," + rzp + "]");
-                        System.out.println("");
+//
+//                        System.out.println("movej(");
+//                        System.out.println("[" + x1norm + "," + y1norm + "," + z1norm + "," + rxnorm + "," + rynorm + "," + rznorm + "]");
+//                        System.out.println("");
+//                        System.out.println("movej(p[");
+//                        System.out.println("[" + x1p + "," + y1p + "," + z1p + "," + rxp + "," + ryp + "," + rzp + "]");
+//                        System.out.println("");
 
                         /*
                         State of the robot, will create a GUI for it at a
                         later time. I have no idea how to create a GUI or make
                         it look pretty. Work in progress
-                        */
+                         */
                         if (b[18] == 0) {
                             System.out.println("UR: disconnected");
                         }
@@ -123,6 +129,9 @@ public class Coordinates implements Runnable {
                     }
                 }
             }
+            statusUR = b[23];
+
         } while (true);
+
     }
 }

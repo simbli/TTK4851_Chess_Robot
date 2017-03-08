@@ -29,10 +29,13 @@ public class RocketfarmUpload {
 //        String filePath = "F:/Dropbox lagring/Dropbox/Prosjekt 14/Bachelor/borgeg/";
 //        String scriptFile = "handshake_v3.script"; // ball_pull_v2  handshake_v2
 
-        String filePath = "F:/GitHub/EiT_chess_robot/URscript/";
+        String filePath = "F:/GitHub/EiT_chess_robot/URscript/newGripper/";
 //       String scriptFile = "palletTest.script"; 
 //        String scriptFile = "pickUpTest.script";
-        String scriptFile = "xyMove.script";
+//        String scriptFile = "xyMove.script";
+         String scriptFile = "xyMoveGripper45deg.script";
+//         String scriptFile = "hoverplan.script";
+         
         
 //        Scanner input = new Scanner(System.in);
 //        String choice;
