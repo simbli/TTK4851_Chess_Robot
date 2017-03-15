@@ -1,28 +1,37 @@
 import cv2
 import numpy as np
-#from camera import take_snapshot
+from ip import getRepresentation, calibrate
+#from video import get_frame
+import sys
 
-#Dummy functions until computer-vision is ready
-def take_snapshot():
-    return 1
+def get_frame():
+    return cv2.imread(sys.argv[1],1)
 
-def get_board(snapshot):
-    return True
+def createInitialBoardMatrix():
+        initialBoard = np.zeros((8,8))
+        initialBoard[:2][:] = 2
+        initialBoard[6:][:] = 1
+        return initialBoard
 
 #Class for getting move
 class Compvision():
     #Initialize with image of first board
-    def __init__(self, snapshot=None):
-        if snapshot == None:
-            snapshot = take_snapshot()
-        self.prev_board = get_board(snapshot)
+    def __init__(self):
+
+        self.boundaries = calibrate()
+        print 'Calibration is complete, please put chesspieces to their positions'
+
+        initialBoard = createInitialBoardMatrix()
+        currentBoard = getRepresentation(self.boundaries, get_frame())
+        while not np.array_equal(initialBoard, currentBoard):
+            print 'Could not detect correct setup, try again'
+            currentBoard = getRepresentation(self.boundaries, get_frame())
+        self.prev_board = currentBoard
         self.board_to_compare = None
     #Takes a new snapshot, and compares the previous one with the new, gives out a move
+
     def get_move(self):
-        #Code here will be added
-        #if self.prev_board == None:
-        #snapshot = take_snapshot()
-        #board = get_board(snapshot)
+        self.board_to_compare = getRepresentation(self.boundaries, get_frame())
         move = self.compare_boards()
         return move
 
@@ -149,3 +158,5 @@ if __name__ == '__main__':
     for i in range(1,8):
         test(i)
     print 'All tests passed'
+
+    c = Compvision()
