@@ -12,17 +12,53 @@ class AI():
 	#generates move with stockfish, makes the move and returns the move to send it to the robot.
 	def get_move_stockfish(self):
 		self.stockfish.set_position(self.moves)
-		self.moves.append(self.stockfish.get_best_move())
-		self.board.push(chess.Move.from_uci(self.moves[len(self.moves)-1]))
+		bestMove = self.stockfish.get_best_move()
+		self.moves.append(bestMove)
+		currentMove = chess.Move.from_uci(self.moves[len(self.moves)-1]);
+		print "CURRENT MOVE:",currentMove
+
+		moveList = []
+		print bestMove[0:2]
+		print bestMove[2:4]
 		
+		if self.board.is_capture(currentMove):
+			if self.board.is_en_passant(currentMove):
+				print "EN PASSANT!!!!"
+				moveList.append(bestMove[2:3] + chr(ord(bestMove[3:4]) + 1) + "i9")
+				moveList.append(bestMove)
+
+			else:
+				print "CAPTURE!!!!"
+				moveList.append(bestMove[2:4]+"i9")
+				moveList.append(bestMove)
+		elif self.board.is_kingside_castling(currentMove):
+			print "KINGSIDE CASTLE!!!"
+			moveList.append(bestMove)
+			moveList.append("h1e1")
+		elif self.board.is_queenside_castling(currentMove):
+			print "QUEENSIDE CASRLE!!!"
+			moveList.append(bestMove)
+			moveList.append("a1d1")
+		else:
+			moveList.append(bestMove)
+
+
 		print "Move made by ai:",self.moves[len(self.moves)-1]
+		self.board.push(currentMove)
 		print self.board 
-		
-		return self.moves[len(self.moves)-1]
+
+		return moveList
 
 
 	#Adds the players move to the move list and the board representation.
 	def set_move(self, move):
 		self.moves.append(move)
-		self.board.push(chess.Move.from_uci(self.moves[len(self.moves)-1]))
+		currentMove = chess.Move.from_uci(self.moves[len(self.moves)-1])
 
+		self.board.push(currentMove)
+
+
+
+if __name__ == "__main__":
+	ai = AI()
+	ai.loopshit()

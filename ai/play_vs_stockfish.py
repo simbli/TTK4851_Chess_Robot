@@ -6,6 +6,9 @@ board = chess.Board()
 stockfish = Stockfish()
 
 moves = []
+print chess.SQUARES
+print chess.SQUARE_NAMES
+print board.piece_type_at(9)
 
 while True:
 	moves.append(raw_input("Next Move:"))
