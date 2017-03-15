@@ -123,6 +123,9 @@ public class Coordinates implements Runnable {
                         if (b[23] == 1) {
                             System.out.println("Program: running");
                         }
+                        if (b[23] != 1) {
+                            System.out.println("Program: stopped");
+                        }
                         if (b[24] == 1) {
                             System.out.println("Program: paused");
                         }

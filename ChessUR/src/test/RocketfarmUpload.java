@@ -17,7 +17,7 @@ import java.nio.file.Paths;
  * @author Børge
  */
 public class RocketfarmUpload {
-    
+
     static double x1, y1, z1, rx, ry, rz, a, v;
     static String script
             = "def test():\n"
@@ -33,13 +33,12 @@ public class RocketfarmUpload {
 //       String scriptFile = "palletTest.script"; 
 //        String scriptFile = "pickUpTest.script";
 //        String scriptFile = "xyMove.script";
-         String scriptFile = "xyMoveGripper45deg.script";
-//         String scriptFile = "hoverplan.script";
-         
-        
+//         String scriptFile = "xyMoveGripper45deg.script";
+//         String scriptFile = "lineupBricks.script";
+        String scriptFile = "kickOutpiece.script";
+
 //        Scanner input = new Scanner(System.in);
 //        String choice;
-
         String serverName = "192.168.0.3";
         int port = 30002;
 //        int port = 63350;
@@ -273,7 +272,6 @@ public class RocketfarmUpload {
         return new String(encoded, Charset.defaultCharset());
     }
 }
-
 
 //            /*
 //            Choose if we want to send a string or file to server

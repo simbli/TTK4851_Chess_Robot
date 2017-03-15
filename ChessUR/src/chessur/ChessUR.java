@@ -58,10 +58,8 @@ public class ChessUR {
 
         String scriptToWrite;
 
-        // Finn ut av dette........
-        while (crd.getStatusUR() == 1) {
-            System.out.println("Status UR: Running script");
-        }
+        // Finn ut av dette........crd.getStatusUR()
+       
         int i = 0;
         while (true) {
             //Get's script to be sendt
@@ -79,6 +77,7 @@ public class ChessUR {
             }
             i++;
         }
+      
     }
 
 }
