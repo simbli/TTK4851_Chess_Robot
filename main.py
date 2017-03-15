@@ -12,7 +12,7 @@ def send_move(moves):
 		s.connect(('127.0.0.1', 5005))
 		s.send(moves[i])
 		s.close()
-		time.sleep(10)
+		time.sleep(15)
 
 
 def createGUI():
@@ -32,7 +32,7 @@ def createGUI():
 	startButton = Tkinter.Button(window, text = "LOOOL", command = LOOOL)
 	startButton.place(relx = 0.5, rely=0.6, anchor='center')
 	window.geometry(str(window_width)+"x"+str(window_height))
-	
+
 
 
 def main():

@@ -8,7 +8,7 @@ class AI():
 		self.board = chess.Board()
 		self.stockfish = Stockfish()
 		self.moves = []
-	
+
 	#generates move with stockfish, makes the move and returns the move to send it to the robot.
 	def get_move_stockfish(self):
 		self.stockfish.set_position(self.moves)
@@ -20,11 +20,11 @@ class AI():
 		moveList = []
 		print bestMove[0:2]
 		print bestMove[2:4]
-		
+
 		if self.board.is_capture(currentMove):
 			if self.board.is_en_passant(currentMove):
 				print "EN PASSANT!!!!"
-				moveList.append(bestMove[2:3] + chr(ord(bestMove[3:4]) + 1) + "i9")
+				moveList.append(bestMove[2:3] + chr(ord(bestMove[3:4]) + 1) + "j8")
 				moveList.append(bestMove)
 
 			else:
@@ -34,18 +34,18 @@ class AI():
 		elif self.board.is_kingside_castling(currentMove):
 			print "KINGSIDE CASTLE!!!"
 			moveList.append(bestMove)
-			moveList.append("h1e1")
+			moveList.append("h8f8")
 		elif self.board.is_queenside_castling(currentMove):
-			print "QUEENSIDE CASRLE!!!"
+			print "QUEENSIDE CASTLE!!!"
 			moveList.append(bestMove)
-			moveList.append("a1d1")
+			moveList.append("a8d8")
 		else:
 			moveList.append(bestMove)
 
 
 		print "Move made by ai:",self.moves[len(self.moves)-1]
 		self.board.push(currentMove)
-		print self.board 
+		print self.board
 
 		return moveList
 
