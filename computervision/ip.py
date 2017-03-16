@@ -141,14 +141,17 @@ def createBoardMatrix(frame):
             board[i][j][0] = np.round(sorted_corners[i-1][j-1][0])
             board[i][j][1] = np.round(sorted_corners[i-1][j-1][1])
 
-    #print board
     return board
 
-def print_corner(image, board):
-    cv2.drawChessboardCorners(image, (7,7), board, False)
-    cv2.imshow('Drawn corner', image)
-    cv2.waitKey(0)
+def check_order(image, representation):
+    for i in range(9):
+        for j in range(9):
+            cv2.circle(image,(np.int(representation[i][j][0]),np.int(representation[i][j][1])), 5, (0,0,255), -1)
 
+def draw_internal_corners(image, corners):
+    for c in corners:
+        cv2.drawChessboardCorners(image, (7,7), c, False)
+        show_image(image)
 
 def calibrate(frame=None):
     calibration_filename = 'boundaries.npy'
@@ -162,6 +165,7 @@ def calibrate(frame=None):
             if frame is None:
                 frame = get_frame()
             found, corners = cv2.findChessboardCorners(frame, (7,7))#, flags=cv2.cv.CV_CALIB_CB_ADAPTIVE_THRESH)
+            #draw_internal_corners(frame.copy(),corners)
             if found and len(corners) == 49:
                 calibrated = True
                 boundaries = createBoardMatrix(frame)
@@ -176,11 +180,12 @@ def getCentroid(contour):
     return cx, cy
 
 def checkSquareForContours(image, board, row, col):
-    torow = int(max(board[row][col][0], board[row][col+1][0]))
-    fromrow = int(min(board[row+1][col][0], board[row+1][col+1][0]))
+    cutoff = 5
+    torow = int(max(board[row][col][0], board[row][col+1][0])) - cutoff
+    fromrow = int(min(board[row+1][col][0], board[row+1][col+1][0])) + cutoff
 
-    tocol = int(max(board[row][col][1], board[row+1][col][1]))
-    fromcol = int(min(board[row][col+1][1], board[row+1][col+1][1]))
+    tocol = int(max(board[row][col][1], board[row+1][col][1])) - cutoff
+    fromcol = int(min(board[row][col+1][1], board[row+1][col+1][1])) + cutoff
     cropped = image[fromcol:tocol, fromrow:torow]
     res = findContour(cropped)
     return res
@@ -189,24 +194,13 @@ def show_image(image):
     cv2.imshow('', image)
     cv2.waitKey(0)
 
-def findContour(image):
-    #show_image(image)
+def findChesspieceColor(image, contours):
     TH_BLACK_WHITE = 70 #Threshold of color intesity to separate white from black pieces
-    #Find optimal thresholding algorithm
-    #res1, thresh = cv2.threshold(image,127,255,cv2.THRESH_BINARY)
-    #res2, thresh = cv2.threshold(gray, 150,255,cv2.THRESH_BINARY)
-    #thresh = cv2.adaptiveThreshold(image, 255 ,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,19,2)
-    canny = cv2.Canny(image, 200, 250)#, L2gradient=True)
-    contours = cv2.findContours(canny, cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-    contours = contours[0]
     i = 0
-    #show_image(canny)
-
     for contour in contours:
         (x,y,w,h) = cv2.boundingRect(contour)
-        #print 'width/height = {},{}'.format(w,h)
+        i+=1
         if w < 47 and w > 10 and h < 47 and  h > 10: #Compute these values instead of hardcode them
-            i += 1
             cx, cy = getCentroid(contour)
             l = []
             for j in range(-1,2):
@@ -217,14 +211,22 @@ def findContour(image):
                     except:
                         pass
             mean_val = np.mean(l)
-            #print 'Value of centroid pixel is: {}'.format(val)
-            #print 'Mean of 3x3 centroid is: {}'.format(mean_val)
             if mean_val < TH_BLACK_WHITE:
                 return 2
             else:
                 return 1
     if i != 1 or 2:
         return 0
+
+def findContour(image):
+    #Find optimal thresholding algorithm
+    #res1, thresh = cv2.threshold(image,127,255,cv2.THRESH_BINARY)
+    #res2, thresh = cv2.threshold(gray, 150,255,cv2.THRESH_BINARY)
+    #thresh = cv2.adaptiveThreshold(image, 255 ,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,19,2)
+    canny = cv2.Canny(image, 25, 90)#, L2gradient=True)
+    contours = cv2.findContours(canny, cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    contours = contours[0]
+    return findChesspieceColor(image, contours)
 
 def getRepresentation(boundaries, image, N_SQUARES=8):
     mat = np.zeros((N_SQUARES,N_SQUARES))
@@ -240,11 +242,13 @@ def openAndInitializeImage(filename):
     return image
 
 if __name__ == '__main__':
+    #Usage: python <calibrationimage> <image_to_be_checked>
+
     calibration_image_filename = sys.argv[1]
     chessboard_image_filename = sys.argv[2]
     calibration_image = openAndInitializeImage(calibration_image_filename)
     chessboard_image = openAndInitializeImage(chessboard_image_filename)
-
     boundaries = calibrate(calibration_image)
+
     res = getRepresentation(boundaries, chessboard_image)
     print res
