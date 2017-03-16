@@ -3,7 +3,7 @@ window = Tkinter.Tk()
 window_width = 800
 window_height = 600
 def LOOOL():
-	print "LOOOL"
+	text_field.config(text = "TEST")
 
 window.title("Chess robot")
 

@@ -17,7 +17,7 @@ import java.nio.file.Paths;
  * @author Børge
  */
 public class RocketfarmUpload {
-    
+
     static double x1, y1, z1, rx, ry, rz, a, v;
     static String script
             = "def test():\n"
@@ -29,20 +29,23 @@ public class RocketfarmUpload {
 //        String filePath = "F:/Dropbox lagring/Dropbox/Prosjekt 14/Bachelor/borgeg/";
 //        String scriptFile = "handshake_v3.script"; // ball_pull_v2  handshake_v2
 
-        String filePath = "F:/GitHub/EiT_chess_robot/URscript/";
-        String scriptFile = "pickUpTest.script"; //handshake_v3
+        String filePath = "F:/GitHub/EiT_chess_robot/URscript/newGripper/";
+//       String scriptFile = "palletTest.script"; 
+//        String scriptFile = "pickUpTest.script";
+//        String scriptFile = "xyMove.script";
+         String scriptFile = "xyMoveGripper45deg.script";
+//         String scriptFile = "lineupBricks.script";
+//        String scriptFile = "kickOutpiece.script";
+//        String scriptFile = "toBucket.script";
 
-        
 //        Scanner input = new Scanner(System.in);
 //        String choice;
-
         String serverName = "192.168.0.3";
         int port = 30002;
 //        int port = 63350;
 
         // acceleration and velocity
         a = 0.4;
-        
         v = 0.1;
         //  Safe positions
         x1 = 0.2;
@@ -270,7 +273,6 @@ public class RocketfarmUpload {
         return new String(encoded, Charset.defaultCharset());
     }
 }
-
 
 //            /*
 //            Choose if we want to send a string or file to server
