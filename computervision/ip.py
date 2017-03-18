@@ -86,7 +86,9 @@ def getBoundariesFromFile(filename='boundaries.npy'):
 
 def createBoardMatrix(frame):
     found, corners = cv2.findChessboardCorners(frame,(7,7))
-    sorted_corners = sortCorners(corners)
+    #sorted_corners = sortCorners(corners)
+    sorted_corners = hack_corners(corners)
+    #check_order(frame, sorted_corners)
     midPixelIndex = 24
     midPixelX = corners[midPixelIndex][0][0]
     midPixelY = corners[midPixelIndex][0][1]
@@ -94,7 +96,8 @@ def createBoardMatrix(frame):
     startPixelX = corners[0][0][0]
     startPixelY = corners[0][0][1]
 
-    squareSize = findSquareSize(corners)
+    squareSize = findSquareSize(sorted_corners)
+    print 'SquareSize = {}'.format(squareSize)
     matSize = 9
     internalCorners = 7
     board = np.zeros((9,9,2))
@@ -141,12 +144,24 @@ def createBoardMatrix(frame):
             board[i][j][0] = np.round(sorted_corners[i-1][j-1][0])
             board[i][j][1] = np.round(sorted_corners[i-1][j-1][1])
 
+    check_order(frame, board)
     return board
 
 def check_order(image, representation):
     for i in range(9):
         for j in range(9):
             cv2.circle(image,(np.int(representation[i][j][0]),np.int(representation[i][j][1])), 5, (0,0,255), -1)
+            show_image(image)
+
+def hack_corners(corners):
+    new_board = np.zeros((7,7,2))
+    internalCorners = 7
+    cornersLength = 48
+    for i in range(internalCorners):
+        for j in range(internalCorners):
+            new_board[i, j, 0] = np.int(corners[cornersLength - (i * internalCorners + j)][0][0])
+            new_board[i, j, 1] = np.int(corners[cornersLength - (i * internalCorners + j)][0][1])
+    return new_board
 
 def draw_internal_corners(image, corners):
     for c in corners:
@@ -165,7 +180,6 @@ def calibrate(frame=None):
             if frame is None:
                 frame = get_frame()
             found, corners = cv2.findChessboardCorners(frame, (7,7))#, flags=cv2.cv.CV_CALIB_CB_ADAPTIVE_THRESH)
-            #draw_internal_corners(frame.copy(),corners)
             if found and len(corners) == 49:
                 calibrated = True
                 boundaries = createBoardMatrix(frame)
