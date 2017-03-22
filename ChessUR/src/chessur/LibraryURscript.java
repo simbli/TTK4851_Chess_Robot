@@ -14,63 +14,15 @@ package chessur;
 public class LibraryURscript {
 
     static String payloadUR = "0.850"; // in kilograms (0.850 kg 2finger griper)
+    static String gravity = "[0.0 , 0.0 , 9.82]";
     static String serverPC;
     static int portPC;
     static double a = 1.2;
-    static double v = 1.2;
+    static double v = 1.5;
 
     public LibraryURscript(String serverPC, int portPC) {
         this.serverPC = serverPC;
         this.portPC = portPC;
-    }
-
-    public String threadSensorData() {
-        String threadSensorData
-                = "	thread SensorDataThread(): \n"
-                + "		socket_close(\"stream\") #Close the stream \"stream\"\n"
-                + "		socket_open(\"127.0.0.1\",63351,\"stream\")\n"
-                + "		sleep(3)\n"
-                + "		socket_close(\"pc_connect\") #Close the stream \"pc_connect\"\n"
-                + "             global var_1 =   False  \n" // new
-                + "         while (var_1 ==  False  ):\n"// new
-                + "		global var_1 = socket_open(\"" + serverPC + "\"," + portPC + ",\"pc_connect\")\n" // new
-                + "         end\n"// new
-                + "		socket_send_string(\"StartOfInput\", \"pc_connect\")\n"
-                + "		socket_send_string(\";\", \"pc_connect\")\n"
-                + "		while True:\n" // new
-                + "			global sensor_data = socket_read_ascii_float(6,\"stream\")\n"
-                + "			varmsg(\"sensor_data\",sensor_data)\n"
-                + "			if (sensor_data[0]  >=6): #IfSensorDataArrayIsFilledThenRun\n"
-                + "				global Fx = sensor_data[1]#Set input sensor data to appropiate variables\n"
-                + "				global Fy = sensor_data[2]\n"
-                + "				global Fz = sensor_data[3]\n"
-                + "				global Mx = sensor_data[4]\n"
-                + "				global My = sensor_data[5]\n"
-                + "				global Mz = sensor_data[6]\n"
-                + "			else: #IfItIsNotThenSetThemAllToZer0\n"
-                + "				global Fx = 0.0 # set the variables to zer0\n"
-                + "				global Fy = 0.0\n"
-                + "				global Fz = 0.0\n"
-                + "				global Mx = 0.0\n"
-                + "				global My = 0.0\n"
-                + "				global Mz = 0.0\n"
-                + "			end #EndIf\n"
-                + "			socket_send_string(\";\", \"pc_connect\")#New Line in java, to seperate the informationblocks\n"
-                + "			socket_send_string(\"Fx: \", \"pc_connect\")#SendVariables\n"
-                + "			socket_send_string(Fx, \"pc_connect\")#SendVariables\n"
-                + "			socket_send_string(\";\", \"pc_connect\")#NewLineInJava\n"
-                + "			socket_send_string(\"Fy: \", \"pc_connect\")\n"
-                + "			socket_send_string(Fy, \"pc_connect\")\n"
-                + "			socket_send_string(\";\", \"pc_connect\")\n"
-                + "			socket_send_string(\"Fz: \", \"pc_connect\")\n"
-                + "			socket_send_string(Fz, \"pc_connect\")\n"
-                + "			socket_send_string(\";\", \"pc_connect\")\n"
-                + "			sleep(0.5)\n"
-                + "    global var_1 =   False\n"
-                + "		end #EndWhile\n"
-                + "	end #EndThread\n"
-                + " threadId_SensorDataThread = run SensorDataThread() #RunThread\n";
-        return threadSensorData;
     }
 
     public String initUR() {
@@ -102,7 +54,7 @@ public class LibraryURscript {
                 + "  modbus_set_runstate_dependent_choice(\"MODBUS_LOKAL\",0)\n"
                 + "  set_tcp(p[0.0,0.0,0.0,0.0,0.0,0.0])\n"
                 + "  set_payload(" + payloadUR + ")\n"
-                + "  set_gravity([0.0, 0.0, 9.82])\n"
+                + "  set_gravity(" + gravity + ")\n"
                 + "\n";
         return initUR;
     }
@@ -825,4 +777,96 @@ public class LibraryURscript {
         return initUR() + initGripper() + moveChessPiece;
     }
 
+    public String lineUpPieces() {
+        String lineUpPieces
+                = "\n"
+                + "  a=" + a + "\n"
+                + "  v=" + v + "\n"
+                + "  # Home position\n"
+                + "  home=[1.5766899585723877, -1.1896641890155237, 0.01620197296142578, -0.1944206396685999, -1.5496752897845667, -0.1212380568133753]\n"
+                + "  movej(home, a, v)\n"
+                + "  sleep(0.1)\n"
+                + "\n"
+                + "\n"
+                + "  j= -1\n"
+                + "\n"
+                + "  while j < 1:\n"
+                + "      j = j + 1\n"
+                + "      i= -1\n"
+                + "      while i < 7:\n"
+                + "          i = i + 1\n"
+                + "          moveCoordinates=[i, j, j, i]\n"
+                + "          # Open gripper\n"
+                + "          $ 6 \"Gripper Move 60%\"\n"
+                + "          if(not rq_is_gripper_activated()):\n"
+                + "            popup(\"The gripper is not activated. Please activate the gripper using the Gripper Toolbar and run the program again.\")\n"
+                + "            end\n"
+                + "          rq_set_speed_norm(100)\n"
+                + "          rq_set_force_norm(0)\n"
+                + "          rq_move_and_wait_norm(60)\n"
+                + "          sleep(0.1)\n"
+                + "\n"
+                + "          ## Go to position outside board and pick up chess piece\n"
+                + "          x=moveCoordinates[0]\n"
+                + "          y=moveCoordinates[1]\n"
+                + "          #Pallet roof position outside board\n"
+                + "          pose_4 = interpolate_pose(interpolate_pose(p[-.254833942517, -.167381059611, .271535461998, -1.134897459072, -2.914496582881, .013978797920], p[-.253424821618, -.422870230504, .274735190715, -1.139022155606, -2.927049316123, -.043443584008], x/7), interpolate_pose(p[-.216222299269, -.170427377313, .274690128813, -1.139281610927, -2.927316806428, -.043499083199], p[-.216238785672, -.422869250739, .274724161128, -1.139147444196, -2.927251113408, -.043375339322],x/7), y/1)\n"
+                + "          movel(pose_trans(pose_4, pose_trans(pose_inv(p[-.254827311988, -.167380095927, .271530762301, -1.134775579334, -2.914544281122, .013910392717]),p[-.254832908902, -.167382254518, .271550797832, -1.134741179271, -2.914457015616, .014027561219])), a, v)\n"
+                + "          movel(pose_4, a, v)\n"
+                + "          sleep(0.1)\n"
+                + "          #Pallet floor position outside board\n"
+                + "          pose_3 = interpolate_pose(interpolate_pose(p[-.255772274130, -.170552461267, .192927524781, -1.136588145197, -2.919997142492, -.010600249549], p[-.254327786433, -.420112475288, .192959247674, -1.136650162187, -2.919856003970, -.010267918089], x/7), interpolate_pose(p[-.212068895125, -.167826013630, .192936067572, -1.136724005026, -2.919871196624, -.010456719869], p[-.212038755928, -.420135055957, .192944984529, -1.136686937505, -2.919925489739, -.010408606259],x/7), y/1)\n"
+                + "          movel(pose_trans(pose_3, pose_trans(pose_inv(p[-.255767809133, -.170542497911, .192914828687, -1.136625086372, -2.919990175643, -.010652382269]),p[-.255780895377, -.170545844246, .192938470964, -1.136659712940, -2.919919837938, -.010506198418])), a, v)\n"
+                + "          movel(pose_3, a, v)\n"
+                + "          sleep(0.1)\n"
+                + "          #Grip piece\n"
+                + "          $ 7 \"Gripper Close\"\n"
+                + "          if(not rq_is_gripper_activated()):\n"
+                + "              popup(\"The gripper is not activated. Please activate the gripper using the Gripper Toolbar and run the program again.\")\n"
+                + "              end\n"
+                + "          rq_set_speed_norm(100)\n"
+                + "          rq_set_force_norm(0)\n"
+                + "          rq_move_and_wait_norm(100)\n"
+                + "          sleep(0.1)\n"
+                + "          #Pallet roof position outside board\n"
+                + "          pose_4 = interpolate_pose(interpolate_pose(p[-.254833942517, -.167381059611, .271535461998, -1.134897459072, -2.914496582881, .013978797920], p[-.253424821618, -.422870230504, .274735190715, -1.139022155606, -2.927049316123, -.043443584008], x/7), interpolate_pose(p[-.216222299269, -.170427377313, .274690128813, -1.139281610927, -2.927316806428, -.043499083199], p[-.216238785672, -.422869250739, .274724161128, -1.139147444196, -2.927251113408, -.043375339322],x/7), y/1)\n"
+                + "          movel(pose_trans(pose_4, pose_trans(pose_inv(p[-.254827311988, -.167380095927, .271530762301, -1.134775579334, -2.914544281122, .013910392717]),p[-.254832908902, -.167382254518, .271550797832, -1.134741179271, -2.914457015616, .014027561219])), a, v)\n"
+                + "          movel(pose_4, a, v)\n"
+                + "          sleep(0.1)\n"
+                + "\n"
+                + "\n"
+                + "          ## Go to board and place chess piece\n"
+                + "          x=moveCoordinates[2]\n"
+                + "          y=moveCoordinates[3]\n"
+                + "          #Pallet roof position\n"
+                + "          pose_2 = interpolate_pose(interpolate_pose(p[-.148641277261, -.167405716930, .275361426469, -1.134769567978, -2.914423792411, .014017954756], p[-.148646876515, -.483029173626, .275354214052, -1.134793377507, -2.914454179611, .013918668104], x/7), interpolate_pose(p[.166986285479, -.159722961604, .275343950373, -1.134896905575, -2.914384054477, .013926778521], p[.169206615709, -.476161017990, .275299159949, -1.091812717031, -2.930982132936, .014329235678],x/7), y/7)\n"
+                + "          movel(pose_trans(pose_2, pose_trans(pose_inv(p[-.148638030624, -.167396705711, .275346546436, -1.134838045119, -2.914343741892, .014009526471]),p[-.148639018422, -.167404715372, .275344789831, -1.134826315810, -2.914418463365, .014046348421])), a, v)\n"
+                + "          movel(pose_2, a, v)\n"
+                + "          sleep(0.1)\n"
+                + "          #Pallet floor position\n"
+                + "          pose_1 = interpolate_pose(interpolate_pose(p[-.148633351389, -.167394963703, .194329602083, -1.134838408600, -2.914506214363, .013735227554], p[-.145707080294, -.484734867814, .194347589162, -1.134730656245, -2.914436947954, .013832446082], x/7), interpolate_pose(p[.167705746025, -.164369800443, .195279302190, -1.134698766016, -2.914529747681, .013920708709], p[.171477909925, -.479552206583, .195292366342, -1.134807515510, -2.914466354089, .013865408924],x/7), y/7)\n"
+                + "          movel(pose_trans(pose_1, pose_trans(pose_inv(p[-.148630421465, -.167396054366, .194349126896, -1.134806994234, -2.914425749961, .013895494310]),p[-.148638846167, -.167385549674, .194358488408, -1.134913113336, -2.914336237337, .013928892405])), a, v)\n"
+                + "          movel(pose_1, a, v)\n"
+                + "          sleep(0.1)\n"
+                + "          $ 8 \"Gripper Move 48%\"\n"
+                + "          if(not rq_is_gripper_activated()):\n"
+                + "              popup(\"The gripper is not activated. Please activate the gripper using the Gripper Toolbar and run the program again.\")\n"
+                + "              end\n"
+                + "          rq_set_speed_norm(100)\n"
+                + "          rq_set_force_norm(20)\n"
+                + "          rq_move_and_wait_norm(60)\n"
+                + "          sleep(0.1)\n"
+                + "          #Pallet roof position\n"
+                + "          pose_2 = interpolate_pose(interpolate_pose(p[-.148641277261, -.167405716930, .275361426469, -1.134769567978, -2.914423792411, .014017954756], p[-.148646876515, -.483029173626, .275354214052, -1.134793377507, -2.914454179611, .013918668104], x/7), interpolate_pose(p[.166986285479, -.159722961604, .275343950373, -1.134896905575, -2.914384054477, .013926778521], p[.169206615709, -.476161017990, .275299159949, -1.091812717031, -2.930982132936, .014329235678],x/7), y/7)\n"
+                + "          movel(pose_trans(pose_2, pose_trans(pose_inv(p[-.148638030624, -.167396705711, .275346546436, -1.134838045119, -2.914343741892, .014009526471]),p[-.148639018422, -.167404715372, .275344789831, -1.134826315810, -2.914418463365, .014046348421])), a, v)\n"
+                + "          movel(pose_2, a, v)\n"
+                + "          sleep(0.1)\n"
+                + "      end\n"
+                + "  end\n"
+                + "  # Home position\n"
+                + "  movej(home, a, v)\n"
+                + "end"
+                + "\n";
+        return initUR() + initGripper() + lineUpPieces;
+    }
 }

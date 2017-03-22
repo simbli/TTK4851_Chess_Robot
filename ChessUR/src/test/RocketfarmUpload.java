@@ -33,8 +33,8 @@ public class RocketfarmUpload {
 //       String scriptFile = "palletTest.script"; 
 //        String scriptFile = "pickUpTest.script";
 //        String scriptFile = "xyMove.script";
-         String scriptFile = "xyMoveGripper45deg.script";
-//         String scriptFile = "lineupBricks.script";
+//         String scriptFile = "xyMoveGripper45deg.script";
+         String scriptFile = "lineupBricks.script";
 //        String scriptFile = "kickOutpiece.script";
 //        String scriptFile = "toBucket.script";
 
