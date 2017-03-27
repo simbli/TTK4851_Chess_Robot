@@ -265,4 +265,8 @@ if __name__ == '__main__':
     boundaries = calibrate(calibration_image)
 
     res = getRepresentation(boundaries, chessboard_image)
-    print res
+    try:
+        from plot import plot_array
+        plot_array(res)
+    except:
+        print res
