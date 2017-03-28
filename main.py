@@ -55,7 +55,7 @@ def main():
 
 		#Makes the move on the board
 		ai.set_move(move)
-		update_label("TEST")
+	
 
 		#calculate robot move with ai
 		moves = ai.get_move_stockfish()
