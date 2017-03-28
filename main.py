@@ -2,6 +2,7 @@ import socket
 import ai.ai as artint
 import Tkinter
 import time
+import computervision.cv as cv
 
 GUI = False
 
@@ -43,6 +44,7 @@ def update_label(label_text):
 
 
 def main():
+	c = cv.Compvision()
 	ai = artint.AI()
 	if GUI:
 		createGUI()
@@ -51,18 +53,19 @@ def main():
 
 	while not ai.game_over():
 		#get move made by the player from computer vision
-		move = raw_input("Next Move:")
-
+		raw_input('White player: take your move, then press Enter')
+		move = c.get_move()
+		print "White players move: {}".format(move)
 		#Makes the move on the board
 		ai.set_move(move)
-	
 
 		#calculate robot move with ai
 		moves = ai.get_move_stockfish()
-
+		#raw_input('Black player: take your move, then press Enter')
 		#send move to robot
 		#send_move(moves)
-
+		move = c.get_move()
+		print "Black players move: {}".format(move)
 
 if __name__ == "__main__":
 	main()

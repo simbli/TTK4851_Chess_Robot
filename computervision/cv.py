@@ -14,6 +14,11 @@ def createInitialBoardMatrix():
         initialBoard[6:][:] = 1
         return initialBoard
 
+def show_image(image):
+    cv2.imshow('asdf', image)
+    cv2.waitKey(0)
+
+
 #Class for getting move
 class Compvision():
     #Initialize with image of first board
@@ -23,13 +28,13 @@ class Compvision():
         print 'Calibration is complete, please put chesspieces to their positions'
 
         initialBoard = createInitialBoardMatrix()
-        currentBoard = getRepresentation(self.boundaries, get_frame())
-
-        while not np.array_equal(initialBoard, currentBoard):
-            print 'Could not detect correct setup, try again'
-            currentBoard = getRepresentation(self.boundaries, get_frame())
-            plot_array(currentBoard)
-        plot_array(currentBoard)
+        frame = get_frame()
+        currentBoard = getRepresentation(self.boundaries, frame)
+        #while not np.array_equal(initialBoard, currentBoard):
+        #    print 'Could not detect correct setup, try again'
+        #    currentBoard = getRepresentation(self.boundaries, get_frame())
+        #    #plot_array(currentBoard)
+        #plot_array(currentBoard)
 
         self.prev_board = currentBoard
         self.board_to_compare = None
