@@ -81,7 +81,7 @@ def sortCorners(corners):
 def saveBoundariesToFile(filename, boundaries):
     np.save(filename, boundaries)
 
-def getBoundariesFromFile(filename='boundaries.npy'):
+def getBoundariesFromFile(filename='computervision/boundaries.npy'):
     return np.load(filename)
 
 
@@ -187,7 +187,7 @@ def removeIntensities(image, th):
 
 
 def calibrate():
-    calibration_filename = 'boundaries.npy'
+    calibration_filename = 'computervision/boundaries.npy'
     if os.path.isfile(calibration_filename):
         print 'Calibration file found, using stored'
         return getBoundariesFromFile(calibration_filename)
@@ -268,6 +268,7 @@ def preprocess(image):
 
 
 def findContour(image):
+    #show_image(image)
     canny = cv2.Canny(image, 25, 90)#, L2gradient=True)
     contours = cv2.findContours(canny, cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     contours = contours[0]
