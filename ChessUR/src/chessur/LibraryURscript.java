@@ -17,8 +17,8 @@ public class LibraryURscript {
     static String gravity = "[0.0 , 0.0 , 9.82]";
     static String serverPC;
     static int portPC;
-    static double a = 1.2;
-    static double v = 1.5;
+    static double a = 1.0;
+    static double v = 5.0;
 
     public LibraryURscript(String serverPC, int portPC) {
         this.serverPC = serverPC;
@@ -27,7 +27,7 @@ public class LibraryURscript {
 
     public String initUR() {
         String initUR
-                = "def palletTest():\n"
+                = "def sciptToUR3():\n"
                 + "  modbus_add_signal(\"127.0.0.1\", 255, 128, 3, \"MODBUS_LOKAL\")\n"
                 + "  modbus_set_signal_update_frequency(\"MODBUS_LOKAL\", 10)\n"
                 + "  modbus_add_signal(\"127.0.0.1\", 255, 300, 2, \"MODBUS_1\")\n"
