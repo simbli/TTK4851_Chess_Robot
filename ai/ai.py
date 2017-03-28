@@ -9,6 +9,9 @@ class AI():
 		self.stockfish = Stockfish()
 		self.moves = []
 
+	def game_over(self):
+		return self.board.is_game_over()
+
 	#generates move with stockfish, makes the move and returns the move to send it to the robot.
 	def get_move_stockfish(self):
 		self.stockfish.set_position(self.moves)
