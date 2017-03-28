@@ -48,7 +48,7 @@ def capture_video(output_filename):
 
 def start_video_stream(grayScale=False):
 
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
     while True:
         ret, frame = cap.read()
         if grayScale:
@@ -72,7 +72,7 @@ def show_image(image):
     cv2.waitKey(0)
 
 def get_frame(grayScale=False):
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
     time.sleep(0.5) #hack
     ret, frame = cap.read()
     frame = cv2.flip(frame,-1)

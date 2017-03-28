@@ -56,13 +56,13 @@ class AI():
 	#Adds the players move to the move list and the board representation.
 	def set_move(self, move):
 		if move is False or None:
-			return
+			return False
 		else:
 			self.moves.append(move)
 			currentMove = chess.Move.from_uci(self.moves[len(self.moves)-1])
 
 			self.board.push(currentMove)
-
+			return True
 
 
 if __name__ == "__main__":

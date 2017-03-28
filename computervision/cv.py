@@ -53,9 +53,13 @@ class Compvision():
     def get_move(self, plot=False):
         self.board_to_compare = getRepresentation(self.boundaries, get_frame())
         move = self.compare_boards()
-        self.prev_board = self.board_to_compare
+        if not move:
+            print 'An error occured, place piece back to original location'
+        else:
+            self.prev_board = self.board_to_compare
         if plot:
             plot_array(self.board_to_compare)
+        print self.board_to_compare
         return move
 
     def check_if_move_is_correct(self, move_to_check):
@@ -97,9 +101,8 @@ class Compvision():
                     print 'An error may have occured'
 
             else:
-                print len(diff_index[0])
                 print 'An error occured, Please check that the pieces are standing correct'
-                return False
+            return False
 
 
 def test(case_number):
