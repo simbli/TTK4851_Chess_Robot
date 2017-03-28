@@ -274,6 +274,7 @@ def findContour(image):
     return findChesspieceColor(image, contours)
 
 def getRepresentation(boundaries, image, N_SQUARES=8):
+    #Move preprocessing on each square
     image = preprocess(image)
     mat = np.zeros((N_SQUARES,N_SQUARES))
     for i in range(N_SQUARES):

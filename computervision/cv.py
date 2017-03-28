@@ -33,7 +33,7 @@ class Compvision():
 
         self.prev_board = currentBoard
         self.board_to_compare = None
-        self.run()
+        #self.run()
     #Takes a new snapshot, and compares the previous one with the new, gives out a move
 
     def run(self):
@@ -44,9 +44,13 @@ class Compvision():
             print move
             name = raw_input('Press enter to continue')
             self.prev_board = self.board_to_compare
-    def get_move(self):
+
+    def get_move(self, plot=False):
         self.board_to_compare = getRepresentation(self.boundaries, get_frame())
         move = self.compare_boards()
+        self.prev_board = self.board_to_compare
+        if plot:
+            plot_array(self.board_to_compare)
         return move
 
     def check_if_move_is_correct(self, move_to_check):
@@ -64,6 +68,7 @@ class Compvision():
             return False
         else:
             diff_index = np.where(self.prev_board != self.board_to_compare)
+
             if len(diff_index[0]) == 2:
                 color_val_from = self.board_to_compare[diff_index[0][0]][diff_index[1][0]]
                 color_val_to = self.board_to_compare[diff_index[0][1]][diff_index[1][1]]
@@ -73,6 +78,7 @@ class Compvision():
                 if color_val_to == 0:
                     (frm, to) = (to, frm)
                 return frm + to
+
             elif len(diff_index[0]) == 4:
                 if all(self.prev_board[7][4:] == [1,0,0,1]):
                     return 'e1g1'
@@ -83,11 +89,11 @@ class Compvision():
                 elif all(self.prev_board[0][:5] == [2,0,0,0,2]):
                     return 'e8c8'
                 else:
-                    print 'an error occured'
+                    print 'An error may have occured'
 
             else:
                 print len(diff_index[0])
-                print 'an error occured'
+                print 'An error occured, Please check that the pieces are standing correct'
                 return False
 
 
@@ -174,3 +180,6 @@ if __name__ == '__main__':
 #    print 'All tests passed'
 
     c = Compvision()
+    while True:
+        msg = raw_input('Press any button')
+        print c.get_move(plot=True)
