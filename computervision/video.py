@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import sys
+import time
 
 #Sets up videostream from video source 0.
 #Press s to take snapshot
@@ -66,8 +67,13 @@ def start_video_stream(grayScale=False):
     pass
 
 
+def show_image(image):
+    cv2.imshow('test', image)
+    cv2.waitKey(0)
+
 def get_frame(grayScale=False):
-    cap= cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(1)
+    time.sleep(0.5) #hack
     ret, frame = cap.read()
     frame = cv2.flip(frame,-1)
     if grayScale:

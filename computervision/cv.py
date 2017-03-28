@@ -1,11 +1,12 @@
 import cv2
 import numpy as np
 from ip import getRepresentation, calibrate
-#from video import get_frame
+from video import get_frame
 import sys
-
-def get_frame():
-    return cv2.imread(sys.argv[1],1)
+from plot import plot_array
+import time
+#def get_frame():
+#    return cv2.imread(sys.argv[1],1)
 
 def createInitialBoardMatrix():
         initialBoard = np.zeros((8,8))
@@ -23,13 +24,26 @@ class Compvision():
 
         initialBoard = createInitialBoardMatrix()
         currentBoard = getRepresentation(self.boundaries, get_frame())
+
         while not np.array_equal(initialBoard, currentBoard):
             print 'Could not detect correct setup, try again'
             currentBoard = getRepresentation(self.boundaries, get_frame())
+            plot_array(currentBoard)
+        plot_array(currentBoard)
+
         self.prev_board = currentBoard
         self.board_to_compare = None
+        self.run()
     #Takes a new snapshot, and compares the previous one with the new, gives out a move
 
+    def run(self):
+        while True:
+            self.board_to_compare = getRepresentation(self.boundaries, get_frame())
+            plot_array(self.board_to_compare)
+            move = self.get_move()
+            print move
+            name = raw_input('Press enter to continue')
+            self.prev_board = self.board_to_compare
     def get_move(self):
         self.board_to_compare = getRepresentation(self.boundaries, get_frame())
         move = self.compare_boards()
@@ -155,8 +169,8 @@ if __name__ == '__main__':
     #7: Castling black
         #7: Castling queens side
         #8: Castling kings side
-    for i in range(1,8):
-        test(i)
-    print 'All tests passed'
+#    for i in range(1,8):
+#        test(i)
+#    print 'All tests passed'
 
     c = Compvision()

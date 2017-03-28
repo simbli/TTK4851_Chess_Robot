@@ -12,6 +12,8 @@ def plot_array(board):
                 plt.plot(i,7-j, 'ko', markersize=12)
             else:
                 print 'something is off'
+    plt.xlim([-1, 8])
+    plt.ylim([-1, 8])
     plt.show()
 
 if __name__ == '__main__':

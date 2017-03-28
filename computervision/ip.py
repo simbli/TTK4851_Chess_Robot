@@ -5,6 +5,7 @@ import numpy as np
 import math
 import copy
 import os.path
+import matplotlib.pyplot as plt
 #image = get_frame()
 
 #def get_frame():
@@ -144,7 +145,6 @@ def createBoardMatrix(frame):
             board[i][j][0] = np.round(sorted_corners[i-1][j-1][0])
             board[i][j][1] = np.round(sorted_corners[i-1][j-1][1])
 
-    check_order(frame, board)
     return board
 
 def check_order(image, representation):
@@ -163,12 +163,30 @@ def hack_corners(corners):
             new_board[i, j, 1] = np.int(corners[cornersLength - (i * internalCorners + j)][0][1])
     return new_board
 
+#May need these functions
+
+def hack_corners2(corners):
+    pass
+
+def hack_corners3(corners):
+    pass
+
+def hack_corners4(corners):
+    pass
+
 def draw_internal_corners(image, corners):
     for c in corners:
         cv2.drawChessboardCorners(image, (7,7), c, False)
         show_image(image)
 
-def calibrate(frame=None):
+def removeIntensities(image, th):
+    for i in range(image.shape[0]):
+        for j in range(image.shape[1]):
+            if image[i,j] > th:
+                image[i,j] = th
+
+
+def calibrate():
     calibration_filename = 'boundaries.npy'
     if os.path.isfile(calibration_filename):
         print 'Calibration file found, using stored'
@@ -176,10 +194,9 @@ def calibrate(frame=None):
     else:
         calibrated = False
         while not calibrated:
-            print 'Trying to calibrate'
-            if frame is None:
-                frame = get_frame()
+            frame = get_frame()
             found, corners = cv2.findChessboardCorners(frame, (7,7))#, flags=cv2.cv.CV_CALIB_CB_ADAPTIVE_THRESH)
+            print 'Trying to calibrate, found {} of 64 corners'.format(len(corners) + 15)
             if found and len(corners) == 49:
                 calibrated = True
                 boundaries = createBoardMatrix(frame)
@@ -211,14 +228,16 @@ def show_image(image):
 def findChesspieceColor(image, contours):
     TH_BLACK_WHITE = 70 #Threshold of color intesity to separate white from black pieces
     i = 0
+    size = 3
     for contour in contours:
         (x,y,w,h) = cv2.boundingRect(contour)
         i+=1
         if w < 47 and w > 10 and h < 47 and  h > 10: #Compute these values instead of hardcode them
+            #print 'Current Contour is: w:{} h:{}'.format(w,h)
             cx, cy = getCentroid(contour)
             l = []
-            for j in range(-1,2):
-                for k in range(-1,2):
+            for j in range(-(size-1)/2,(size-1)/2 + 1):
+                for k in range(-(size-1)/2,(size-1)/2 + 1):
                     try:
                         val = image[cx+j,cy+k]
                         l.append(val)
@@ -232,17 +251,30 @@ def findChesspieceColor(image, contours):
     if i != 1 or 2:
         return 0
 
+def getHist(image):
+    vals = image.mean(axis=2).flatten()
+    # plot histogram with 255 bins
+    b, bins, patches = plt.hist(vals, 255)
+    plt.xlim([0,255])
+    plt.show()
+
+def preprocess(image):
+    #th = 200
+    #image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    #removeIntensities(image, th)
+    image = cv2.GaussianBlur(image, (5,5),0)
+    image = cv2.medianBlur(image, 5)
+    return image
+
+
 def findContour(image):
-    #Find optimal thresholding algorithm
-    #res1, thresh = cv2.threshold(image,127,255,cv2.THRESH_BINARY)
-    #res2, thresh = cv2.threshold(gray, 150,255,cv2.THRESH_BINARY)
-    #thresh = cv2.adaptiveThreshold(image, 255 ,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,19,2)
     canny = cv2.Canny(image, 25, 90)#, L2gradient=True)
     contours = cv2.findContours(canny, cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     contours = contours[0]
     return findChesspieceColor(image, contours)
 
 def getRepresentation(boundaries, image, N_SQUARES=8):
+    image = preprocess(image)
     mat = np.zeros((N_SQUARES,N_SQUARES))
     for i in range(N_SQUARES):
         for j in range(N_SQUARES):
@@ -251,7 +283,8 @@ def getRepresentation(boundaries, image, N_SQUARES=8):
 
 def openAndInitializeImage(filename):
     image = cv2.imread(filename, 1)
-    image = cv2.GaussianBlur(image, (5,5),0)
+    image = cv2.GaussianBlur(image, (7,7),0)
+    image = cv2.medianBlur(image, 7)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     return image
 
