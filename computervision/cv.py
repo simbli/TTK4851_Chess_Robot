@@ -35,6 +35,7 @@ class Compvision():
             print 'Could not detect correct setup, try again'
             if plot:
                 plot_array(currentBoard)
+                print currentBoard
             currentBoard = getRepresentation(self.boundaries, get_frame())
             time.sleep(1)
         self.prev_board = currentBoard
