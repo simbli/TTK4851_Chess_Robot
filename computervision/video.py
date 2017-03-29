@@ -48,7 +48,7 @@ def capture_video(output_filename):
 
 def start_video_stream(grayScale=False):
 
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(settings.CAMERA_CHANNEL)
     while True:
         ret, frame = cap.read()
         if grayScale:

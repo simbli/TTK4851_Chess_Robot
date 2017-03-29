@@ -25,18 +25,18 @@ class Compvision():
     #Initialize with image of first board
     def __init__(self, plot=False):
         self.diffs = []
-        self.boundaries = calibrate()
+        self.boundaries, self.meanMatrix = calibrate()
         raw_input('Calibration is complete, please put chesspieces to their positions, then press any key')
 
         initialBoard = createInitialBoardMatrix()
         frame = get_frame()
-        currentBoard = getRepresentation(self.boundaries, frame)
+        currentBoard = getRepresentation(self.boundaries, frame, self.meanMatrix)
         while not np.array_equal(initialBoard, currentBoard):
             print 'Could not detect correct setup, try again'
             if plot:
                 plot_array(currentBoard)
-                print currentBoard
-            currentBoard = getRepresentation(self.boundaries, get_frame())
+            print currentBoard
+            currentBoard = getRepresentation(self.boundaries, get_frame(), self.meanMatrix)
             time.sleep(1)
         self.prev_board = currentBoard
         self.board_to_compare = None
@@ -53,7 +53,7 @@ class Compvision():
 
     def get_move(self, plot=False):
         move = False
-        self.board_to_compare = getRepresentation(self.boundaries, get_frame())
+        self.board_to_compare = getRepresentation(self.boundaries, get_frame(), self.meanMatrix)
         move = self.compare_boards()
         while not move:
             print 'An error occured, please adjust pieces in the following places: {}'.format(self.diffs)
@@ -61,7 +61,7 @@ class Compvision():
                 plot_array(self.board_to_compare)
 
             raw_input('Press any key to check again')
-            self.board_to_compare = getRepresentation(self.boundaries, get_frame())
+            self.board_to_compare = getRepresentation(self.boundaries, get_frame(), self.meanMatrix)
             move = self.compare_boards()
 
         self.prev_board = self.board_to_compare
