@@ -233,8 +233,6 @@ def findChesspieceColor(image, contours, row, col):
                         pass
             mean_val = np.mean(l)
             median_val = np.median(l)
-            if np.abs(mean_val - median_val) > 10:
-                print '({},{}): Median: {}, Mean: {}'.format(row, col, median_val, mean_val)
             if median_val < settings.TH_BLACK_WHITE:
                 return 2
             else:
