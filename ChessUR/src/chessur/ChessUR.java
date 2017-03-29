@@ -1,5 +1,6 @@
 package chessur;
 
+import AIsocket.TCPClient;
 import AIsocket.TCPServer;
 import chessur.LibraryURscript;
 import socket.Coordinates;
@@ -12,7 +13,7 @@ import socket.URsocket;
 public class ChessUR {
 
     /*
-    Here we can set the ip-adress and port to the UR5
+    Here we can set the ip-adress and port to the UR5^
      */
     static String serverUR = "192.168.0.3";
     static int portUR = 30002;
@@ -29,7 +30,7 @@ public class ChessUR {
     true sends string script, false sends file
      */
 //    static boolean choice = true;       //  currently not in use
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         /*
         Create new object and send the ip and port to class URsocket
          */
@@ -60,6 +61,19 @@ public class ChessUR {
                 coordinateThread.start();
             }
             i++;
+            int rofl = 0;
+            while(crd.getStatusUR() == 0){
+                System.out.println("first");
+            }
+            Thread.sleep(1000);
+            while (crd.getStatusUR() == 1){
+                System.out.println("second");
+            }
+            Thread.sleep(1000);
+            
+            
+            System.out.println("loops done!!!");
+            TCPClient.sendConfirmation();
         }
 
     }

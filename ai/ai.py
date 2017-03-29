@@ -6,7 +6,7 @@ class AI():
 
 	def __init__(self):
 		self.board = chess.Board()
-		self.stockfish = Stockfish()
+		self.stockfish = Stockfish(depth=2)
 		self.moves = []
 
 	def game_over(self):
@@ -32,7 +32,7 @@ class AI():
 
 			else:
 				print "CAPTURE!!!!"
-				moveList.append(bestMove[2:4]+"i9")
+				moveList.append(bestMove[2:4]+"n9")
 				moveList.append(bestMove)
 		elif self.board.is_kingside_castling(currentMove):
 			print "KINGSIDE CASTLE!!!"

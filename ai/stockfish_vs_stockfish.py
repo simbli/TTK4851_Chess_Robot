@@ -4,26 +4,35 @@ import time
 
 board = chess.Board()
 
-stockfish = Stockfish()
+shallowfish = Stockfish(depth=17)
+deepfish = Stockfish(depth=17)
+
 
 
 moves = []
 
 while True:
-	moves.append(stockfish.get_best_move())
-	stockfish.set_position(moves)
+	if board.is_game_over():
+		break
+	#raw_input("Press enter to continue...")
+	moves.append(shallowfish.get_best_move())
+	shallowfish.set_position(moves)
+	deepfish.set_position(moves)
 	board.push(chess.Move.from_uci(moves[len(moves)-1]))
 
 	print "ai 1 made move:",moves[len(moves)-1]
 	print board 
 
-	time.sleep(3)
+	if board.is_game_over():
+		break
 
-	moves.append(stockfish.get_best_move())
-	stockfish.set_position(moves)
+	moves.append(deepfish.get_best_move())
+	shallowfish.set_position(moves)
+	deepfish.set_position(moves)
 	board.push(chess.Move.from_uci(moves[len(moves)-1]))
 
 	print "ai 2 made move:",moves[len(moves)-1]
 	print board 
 	print
-	time.sleep(3)
+
+print board.result()

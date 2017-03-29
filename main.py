@@ -8,13 +8,25 @@ GUI = False
 
 def send_move(moves):
 	for i in range(len(moves)):
-
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		s.connect(('127.0.0.1', 5005))
 		s.send(moves[i])
 		s.close()
-		time.sleep(15)
+		get_response()
 
+def get_response():
+	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	s.bind(('127.0.0.1', 5006))
+	s.listen(1)
+
+	conn, addr = s.accept()
+	print 'Connection address:', addr
+	while 1:
+	    data = conn.recv(1024)
+	    if not data: break
+	    print "received data:", data
+	    conn.send(data)  # echo
+	conn.close()
 
 def createGUI():
 	window = Tkinter.Tk()
@@ -44,7 +56,7 @@ def update_label(label_text):
 
 
 def main():
-	c = cv.Compvision()
+#	c = cv.Compvision()
 	ai = artint.AI()
 	if GUI:
 		createGUI()
@@ -53,9 +65,9 @@ def main():
 
 	while not ai.game_over():
 		#get move made by the player from computer vision
-		raw_input('White player: take your move, then press Enter')
-		move = c.get_move()
-		if (move):
+		move = raw_input('White player: take your move, then press Enter')
+#		move = c.get_move()
+		if (True):
 			print "White players move: {}".format(move)
 			#Makes the move on the board
 			ai.set_move(move)
@@ -65,10 +77,10 @@ def main():
 			#raw_input('Black player: take your move, then press Enter')
 			#send move to robot
 			send_move(moves)
-			move = c.get_move()
+#			move = c.get_move()
 			print "Black players move: {}".format(move)
 
 if __name__ == "__main__":
 	main()
 
-window.mainloop()
+#window.mainloop()
