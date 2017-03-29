@@ -56,7 +56,7 @@ def update_label(label_text):
 
 
 def main():
-#	c = cv.Compvision()
+	c = cv.Compvision()
 	ai = artint.AI()
 	if GUI:
 		createGUI()
@@ -66,7 +66,7 @@ def main():
 	while not ai.game_over():
 		#get move made by the player from computer vision
 		move = raw_input('White player: take your move, then press Enter')
-#		move = c.get_move()
+		move = c.get_move()
 		if (True):
 			print "White players move: {}".format(move)
 			#Makes the move on the board
@@ -77,7 +77,7 @@ def main():
 			#raw_input('Black player: take your move, then press Enter')
 			#send move to robot
 			send_move(moves)
-#			move = c.get_move()
+			move = c.get_move()
 			print "Black players move: {}".format(move)
 
 if __name__ == "__main__":
