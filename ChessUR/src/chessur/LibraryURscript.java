@@ -15,15 +15,8 @@ public class LibraryURscript {
 
     static String payloadUR = "0.850"; // in kilograms (0.850 kg 2finger griper)
     static String gravity = "[0.0 , 0.0 , 9.82]";
-    static String serverPC;
-    static int portPC;
     static double a = 1.3;
     static double v = 5.0;
-
-    public LibraryURscript(String serverPC, int portPC) {
-        this.serverPC = serverPC;
-        this.portPC = portPC;
-    }
 
     public String initUR() {
         String initUR

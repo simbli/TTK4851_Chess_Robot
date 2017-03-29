@@ -8,10 +8,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-/**
- *
- * @author Marius Blom <mariusbl@stud.hisf.no>
- */
 public class URsocket {
 /*
     Declaration of variables
