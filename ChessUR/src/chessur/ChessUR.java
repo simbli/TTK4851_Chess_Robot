@@ -12,41 +12,24 @@ import socket.URsocket;
  */
 public class ChessUR {
 
-    /*
-    Here we can set the ip-adress and port to the UR5^
-     */
+    //Set the ip-adress and port to the UR3
     static String serverUR = "192.168.0.3";
     static int portUR = 30002;
 
-    /*
-    Here we can set the ip-address and port for the PC
-    (currently not in use, will implement at a later point)
-     */
-    static String serverPC = "192.168.0.2";
-    static int portPC = 29999;
-
-    /*
-    Here we can choose if we want to send the file or following script to robot
-    true sends string script, false sends file
-     */
-//    static boolean choice = true;       //  currently not in use
     public static void main(String[] args) throws InterruptedException {
-        /*
-        Create new object and send the ip and port to class URsocket
-         */
+
+        //Create new object and send the ip and port to class URsocket
         URsocket client = new URsocket(serverUR, portUR);
+
+        //Create new object for "running program" variable from the UR stream
         Coordinates crd = new Coordinates();
         Thread coordinateThread = new Thread((Runnable) crd);
 
-        /*
-        Create a new object from our Libary of URScripts.
-         */
-        LibraryURscript scriptUR = new LibraryURscript(serverPC, portPC);
-
+        //Create a new object from our Libary of URScripts.
+        LibraryURscript scriptUR = new LibraryURscript();
         String scriptToWrite;
 //        scriptToWrite = scriptUR.lineUpPieces();
 
-        // Status UR:   crd.getStatusUR()
         int i = 0;
         while (true) {
             //Get's script to be sendt
@@ -62,16 +45,15 @@ public class ChessUR {
             }
             i++;
             int rofl = 0;
-            while(crd.getStatusUR() == 0){
+            while (crd.getStatusUR() == 0) {
                 System.out.println("first");
             }
             Thread.sleep(1000);
-            while (crd.getStatusUR() == 1){
+            while (crd.getStatusUR() == 1) {
                 System.out.println("second");
             }
             Thread.sleep(1000);
-            
-            
+
             System.out.println("loops done!!!");
             TCPClient.sendConfirmation();
         }

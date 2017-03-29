@@ -8,10 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import static socket.URsocket.client;
 
-/**
- *
- * @author Marius Blom <mariusbl@stud.hisf.no>
- */
 public class Coordinates implements Runnable {
 
     /*
