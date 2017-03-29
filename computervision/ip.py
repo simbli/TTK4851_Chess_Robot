@@ -6,89 +6,17 @@ import math
 import copy
 import os.path
 import matplotlib.pyplot as plt
-#image = get_frame()
-
-#def get_frame():
-#    return cv2.imread(sys.argv[1],1)
-
+import settings
 
 def findSquareSize(corners):
     uppercorner = corners[0][0][1]
-    lowercorner = corners[6][0][1]
-    return np.round(np.abs(uppercorner - lowercorner) / 6)
-
-
-def sortCorners(corners):
-    new_corners = np.zeros((7,7,2))
-    squareSize = findSquareSize(corners)
-
-    min_corner = 0
-    min_x = corners[0][0][0]
-    min_y = corners[0][0][1]
-    error = squareSize/2
-    for i in range(1,len(corners)):
-        foundMin = False
-        temp_corner = i
-        temp_x = corners[i][0][0]
-        temp_y = corners[i][0][1]
-        if temp_x < min_x - error:
-            if (temp_y < min_y + error):
-                foundMin = True
-        elif temp_x < min_x + error:
-            if (temp_y < min_y - error):
-                foundMin = True
-
-        if foundMin:
-            min_x = temp_x
-            min_y = temp_y
-            min_corner = temp_corner
-
-    new_corners[0][0][0] = corners[min_corner][0][0]
-    new_corners[0][0][1] = corners[min_corner][0][1]
-
-    for i in range(len(new_corners)):
-        row = new_corners[i]
-        for g in range(len(row)):
-            foundCorner = False
-            x = 0
-            y = 0
-            if (g == 0):
-                if (i == 0):
-                    foundCorner = True
-                else:
-                    x = new_corners[i-1][g][0]
-                    y = new_corners[i-1][g][1]+squareSize
-            else:
-                x = new_corners[i][g-1][0]+squareSize
-                y = new_corners[i][g-1][1]
-
-            index = 0
-            while not foundCorner and index < len(corners):
-                corner = corners[index]
-                cornerx = corner[0][0]
-                cornery = corner[0][1]
-                if (np.abs(cornerx-x) < error):
-                    if (np.abs(cornery-y) < error):
-                        foundCorner = True
-                        new_corners[i][g][0] = cornerx
-                        new_corners[i][g][1] = cornery
-
-                index += 1
-            if (not foundCorner):
-                print "i = {}, g = {}. couldnt sort corners because couldnt find corner".format(i,g)
-    return new_corners
-
-def saveBoundariesToFile(filename, boundaries):
-    np.save(filename, boundaries)
-
-def getBoundariesFromFile(filename='computervision/boundaries.npy'):
-    return np.load(filename)
-
+    lowercorner = corners[settings.INTERNAL_CORNERS - 1][0][1]
+    return np.round(np.abs(uppercorner - lowercorner) / (settings.INTERNAL_CORNERS - 1))
 
 def createBoardMatrix(frame):
-    found, corners = cv2.findChessboardCorners(frame,(7,7))
-    #sorted_corners = sortCorners(corners)
-    sorted_corners = hack_corners(corners)
+    found, corners = cv2.findChessboardCorners(frame,(settings.INTERNAL_CORNERS,settings.INTERNAL_CORNERS))
+    #draw_internal_corners(frame.copy(), corners)
+    sorted_corners = sort_corners(corners)
     #check_order(frame, sorted_corners)
     midPixelIndex = 24
     midPixelX = corners[midPixelIndex][0][0]
@@ -98,10 +26,9 @@ def createBoardMatrix(frame):
     startPixelY = corners[0][0][1]
 
     squareSize = findSquareSize(sorted_corners)
-    print 'SquareSize = {}'.format(squareSize)
     matSize = 9
     internalCorners = 7
-    board = np.zeros((9,9,2))
+    board = np.zeros((matSize,matSize,2))
 
     #upper left
     for i in range(2):
@@ -148,13 +75,33 @@ def createBoardMatrix(frame):
     return board
 
 def check_order(image, representation):
-    for i in range(9):
-        for j in range(9):
+    for i in range(settings.MAT_SIZE):
+        for j in range(settings.MAT_SIZE):
             cv2.circle(image,(np.int(representation[i][j][0]),np.int(representation[i][j][1])), 5, (0,0,255), -1)
             show_image(image)
 
-def hack_corners(corners):
-    new_board = np.zeros((7,7,2))
+def sort_corners(corners):
+    centerPixelIndex = len(corners) / 2
+    centerI = corners[centerPixelIndex][0][0]
+    centerJ = corners[centerPixelIndex][0][1]
+
+    startPixelIndex = 0
+    startI = corners[startPixelIndex][0][0]
+    startJ = corners[startPixelIndex][0][1]
+
+    if startI < centerI:
+        if startJ < centerJ:
+            return hack_corners3(corners)
+        else:
+            return hack_corners4(corners)
+    else:
+        if startJ < centerJ:
+            return hack_corners2(corners)
+        else:
+            return hack_corners1(corners)
+
+def hack_corners1(corners):
+    new_board = np.zeros((settings.INTERNAL_CORNERS,settings.INTERNAL_CORNERS,2))
     internalCorners = 7
     cornersLength = 48
     for i in range(internalCorners):
@@ -166,14 +113,35 @@ def hack_corners(corners):
 #May need these functions
 
 def hack_corners2(corners):
-    pass
+    new_board = np.zeros((settings.INTERNAL_CORNERS,settings.INTERNAL_CORNERS,2))
+    internalCorners = 7
+    cornersLength = 48
+    for i in range(internalCorners):
+        for j in range(internalCorners):
+            new_board[i, j, 0] = np.int(corners[internalCorners*(j+1)-i-1][0][0])
+            new_board[i, j, 1] = np.int(corners[internalCorners*(j+1)-i-1][0][1])
+    return new_board
 
 def hack_corners3(corners):
-    pass
+    new_board = np.zeros((settings.INTERNAL_CORNERS,settings.INTERNAL_CORNERS,2))
+    internalCorners = 7
+    cornersLength = 48
+    for i in range(internalCorners):
+        for j in range(internalCorners):
+            new_board[i, j, 0] = np.int(corners[(i * internalCorners + j)][0][0])
+            new_board[i, j, 1] = np.int(corners[(i * internalCorners + j)][0][1])
+    return new_board
+
 
 def hack_corners4(corners):
-    pass
-
+    new_board = np.zeros((settings.INTERNAL_CORNERS,settings.INTERNAL_CORNERS,2))
+    internalCorners = 7
+    cornersLength = 48
+    for i in range(internalCorners):
+        for j in range(internalCorners):
+            new_board[i, j, 0] = np.int(corners[cornersLength - (internalCorners*(j+1)-i-1)][0][0])
+            new_board[i, j, 1] = np.int(corners[cornersLength - (internalCorners*(j+1)-i-1)][0][1])
+    return new_board
 def draw_internal_corners(image, corners):
     for c in corners:
         cv2.drawChessboardCorners(image, (7,7), c, False)
@@ -186,6 +154,12 @@ def removeIntensities(image, th):
                 image[i,j] = th
 
 
+def saveBoundariesToFile(filename, boundaries):
+    np.save(filename, boundaries)
+
+def getBoundariesFromFile(filename):
+    return np.load(filename)
+
 def calibrate():
     calibration_filename = 'computervision/boundaries.npy'
     if os.path.isfile(calibration_filename):
@@ -196,22 +170,31 @@ def calibrate():
         while not calibrated:
             frame = get_frame()
             found, corners = cv2.findChessboardCorners(frame, (7,7))#, flags=cv2.cv.CV_CALIB_CB_ADAPTIVE_THRESH)
-            print 'Trying to calibrate, found {} of 64 corners'.format(len(corners) + 15)
+            try:
+                cornersLength = len(corners)
+            except:
+                cornersLength = 0
+
+            if cornersLength == 0:
+                print 'Trying to calibrate, found {} of 64 corners'.format(cornersLength)
+            else:
+                print 'Trying to calibrate, found {} of 64 corners'.format(cornersLength + 15)
+
             if found and len(corners) == 49:
                 calibrated = True
                 boundaries = createBoardMatrix(frame)
         print 'Calibration complete, saving calibration file'
-        saveBoundariesToFile('boundaries', boundaries)
+        saveBoundariesToFile('computervision/boundaries', boundaries)
         return boundaries
 
 def getCentroid(contour):
     M = cv2.moments(contour)
-    cx = int(M['m10']/(M['m00'] + 1e-9))
-    cy = int(M['m01']/(M['m00'] + 1e-9))
+    cx = int(M['m10']/(M['m00'] + settings.EPSILON))
+    cy = int(M['m01']/(M['m00'] + settings.EPSILON))
     return cx, cy
 
 def checkSquareForContours(image, board, row, col):
-    cutoff = 5
+    cutoff = settings.CUTOFF
     torow = int(max(board[row][col][0], board[row][col+1][0])) - cutoff
     fromrow = int(min(board[row+1][col][0], board[row+1][col+1][0])) + cutoff
 
@@ -226,14 +209,13 @@ def show_image(image):
     cv2.waitKey(0)
 
 def findChesspieceColor(image, contours):
-    TH_BLACK_WHITE = 70 #Threshold of color intesity to separate white from black pieces
+
     i = 0
-    size = 3
+    size = settings.COLOR_MEAN_MASK_SIZE
     for contour in contours:
         (x,y,w,h) = cv2.boundingRect(contour)
         i+=1
-        if w < 47 and w > 10 and h < 47 and  h > 10: #Compute these values instead of hardcode them
-            #print 'Current Contour is: w:{} h:{}'.format(w,h)
+        if w < settings.W_MAX and w > settings.W_MIN and h < settings.H_MAX and h > settings.H_MIN:
             cx, cy = getCentroid(contour)
             l = []
             for j in range(-(size-1)/2,(size-1)/2 + 1):
@@ -244,7 +226,7 @@ def findChesspieceColor(image, contours):
                     except:
                         pass
             mean_val = np.mean(l)
-            if mean_val < TH_BLACK_WHITE:
+            if mean_val < settings.TH_BLACK_WHITE:
                 return 2
             else:
                 return 1
@@ -262,19 +244,20 @@ def preprocess(image):
     #th = 200
     #image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     #removeIntensities(image, th)
-    image = cv2.GaussianBlur(image, (5,5),0)
-    image = cv2.medianBlur(image, 5)
+    image = cv2.GaussianBlur(image, (settings.GAUSSIAN_MASK_SIZE, settings.GAUSSIAN_MASK_SIZE),0)
+    image = cv2.medianBlur(image, settings.MEDIAN_MASK_SIZE)
     return image
 
 
 def findContour(image):
     #show_image(image)
-    canny = cv2.Canny(image, 25, 90)#, L2gradient=True)
+    canny = cv2.Canny(image, settings.CANNY_LOWER, settings.CANNY_HIGHER)#, L2gradient=True)
     contours = cv2.findContours(canny, cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     contours = contours[0]
     return findChesspieceColor(image, contours)
 
-def getRepresentation(boundaries, image, N_SQUARES=8):
+def getRepresentation(boundaries, image):
+    N_SQUARES = settings.CHESSBOARD_SIZE
     #Move preprocessing on each square
     image = preprocess(image)
     mat = np.zeros((N_SQUARES,N_SQUARES))
