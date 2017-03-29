@@ -8,6 +8,7 @@ import os.path
 import matplotlib.pyplot as plt
 import settings
 
+
 def findSquareSize(corners):
     uppercorner = corners[0][0][1]
     lowercorner = corners[settings.INTERNAL_CORNERS - 1][0][1]
@@ -193,7 +194,7 @@ def getCentroid(contour):
     cy = int(M['m01']/(M['m00'] + settings.EPSILON))
     return cx, cy
 
-def checkSquareForContours(image, board, row, col):
+def checkSquareForContours(image, board, row, col,):
     cutoff = settings.CUTOFF
     torow = int(max(board[row][col][0], board[row][col+1][0])) - cutoff
     fromrow = int(min(board[row+1][col][0], board[row+1][col+1][0])) + cutoff
@@ -201,15 +202,18 @@ def checkSquareForContours(image, board, row, col):
     tocol = int(max(board[row][col][1], board[row+1][col][1])) - cutoff
     fromcol = int(min(board[row][col+1][1], board[row+1][col+1][1])) + cutoff
     cropped = image[fromcol:tocol, fromrow:torow]
-    res = findContour(cropped)
+    res = findContour(cropped, row, col)
     return res
+
+def find_color_mean(image):
+    return np.mean(image)
 
 def show_image(image):
     cv2.imshow('', image)
     cv2.waitKey(0)
 
-def findChesspieceColor(image, contours):
-
+def findChesspieceColor(image, contours, row, col):
+    img2 = image.copy()
     i = 0
     size = settings.COLOR_MEAN_MASK_SIZE
     for contour in contours:
@@ -220,13 +224,18 @@ def findChesspieceColor(image, contours):
             l = []
             for j in range(-(size-1)/2,(size-1)/2 + 1):
                 for k in range(-(size-1)/2,(size-1)/2 + 1):
+                    #cv2.drawContours(img2, contour, -1, (0,255,0), 3)
+                    #show_image(img2)
                     try:
                         val = image[cx+j,cy+k]
                         l.append(val)
                     except:
                         pass
             mean_val = np.mean(l)
-            if mean_val < settings.TH_BLACK_WHITE:
+            median_val = np.median(l)
+            if np.abs(mean_val - median_val) > 10:
+                print '({},{}): Median: {}, Mean: {}'.format(row, col, median_val, mean_val)
+            if median_val < settings.TH_BLACK_WHITE:
                 return 2
             else:
                 return 1
@@ -249,22 +258,38 @@ def preprocess(image):
     return image
 
 
-def findContour(image):
+def findContour(image, row, col):
     #show_image(image)
     canny = cv2.Canny(image, settings.CANNY_LOWER, settings.CANNY_HIGHER)#, L2gradient=True)
     contours = cv2.findContours(canny, cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     contours = contours[0]
-    return findChesspieceColor(image, contours)
+    return findChesspieceColor(image, contours, row, col)
 
 def getRepresentation(boundaries, image):
     N_SQUARES = settings.CHESSBOARD_SIZE
     #Move preprocessing on each square
+
     image = preprocess(image)
     mat = np.zeros((N_SQUARES,N_SQUARES))
     for i in range(N_SQUARES):
         for j in range(N_SQUARES):
             mat[i,j] = checkSquareForContours(image, boundaries, i, j)
     return mat
+
+def get_threshold(image, contours):
+    white_list = []
+    black_list = []
+    for i in range(2):
+        for j in range(8):
+            black_list.append(get_median(image, contours, i, j))
+
+    for i in range(6,8):
+        for j in range(8):
+            white_list.append(get_median(image, contours, i, j))
+
+    thresh = np.median(white_list - black_list) / 2
+    print "Optimal threshold is: {}".format(thresh)
+    return thresh
 
 def openAndInitializeImage(filename):
     image = cv2.imread(filename, 1)
