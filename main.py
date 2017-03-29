@@ -4,7 +4,7 @@ import Tkinter
 import time
 import computervision.cv as cv
 
-GUI = True
+GUI = False
 
 def send_move(moves):
 	for i in range(len(moves)):
@@ -16,7 +16,7 @@ def send_move(moves):
 
 def get_response():
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s.bind(('127.0.0.1', 5005))
+	s.bind(('127.0.0.1', 5006))
 	s.listen(1)
 
 	conn, addr = s.accept()
