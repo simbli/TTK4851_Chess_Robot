@@ -6,7 +6,7 @@ class AI():
 
 	def __init__(self):
 		self.board = chess.Board()
-		self.stockfish = Stockfish()
+		self.stockfish = Stockfish(depth=1)
 		self.moves = []
 
 	def game_over(self):
