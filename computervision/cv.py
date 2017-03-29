@@ -5,11 +5,12 @@ from video import get_frame
 import sys
 from plot import plot_array
 import time
+import settings
 #def get_frame():
 #    return cv2.imread(sys.argv[1],1)
 
 def createInitialBoardMatrix():
-        initialBoard = np.zeros((8,8))
+        initialBoard = np.zeros((settings.CHESSBOARD_SIZE,settings.CHESSBOARD_SIZE))
         initialBoard[:2][:] = 2
         initialBoard[6:][:] = 1
         return initialBoard
@@ -22,25 +23,24 @@ def show_image(image):
 #Class for getting move
 class Compvision():
     #Initialize with image of first board
-    def __init__(self):
-
+    def __init__(self, plot=False):
+        self.diffs = []
         self.boundaries = calibrate()
-        print 'Calibration is complete, please put chesspieces to their positions'
+        raw_input('Calibration is complete, please put chesspieces to their positions, then press any key')
 
         initialBoard = createInitialBoardMatrix()
         frame = get_frame()
         currentBoard = getRepresentation(self.boundaries, frame)
-        #while not np.array_equal(initialBoard, currentBoard):
-        #    print 'Could not detect correct setup, try again'
-        #    currentBoard = getRepresentation(self.boundaries, get_frame())
-        #    #plot_array(currentBoard)
-        #plot_array(currentBoard)
-
+        while not np.array_equal(initialBoard, currentBoard):
+            print 'Could not detect correct setup, try again'
+            if plot:
+                plot_array(currentBoard)
+            currentBoard = getRepresentation(self.boundaries, get_frame())
+            time.sleep(1)
         self.prev_board = currentBoard
         self.board_to_compare = None
-        #self.run()
-    #Takes a new snapshot, and compares the previous one with the new, gives out a move
 
+        pass
     def run(self):
         while True:
             self.board_to_compare = getRepresentation(self.boundaries, get_frame())
@@ -51,14 +51,23 @@ class Compvision():
             self.prev_board = self.board_to_compare
 
     def get_move(self, plot=False):
+        move = False
         self.board_to_compare = getRepresentation(self.boundaries, get_frame())
         move = self.compare_boards()
-        if not move:
-            print 'An error occured, place piece back to original location'
-        else:
-            self.prev_board = self.board_to_compare
+        while not move:
+            print 'An error occured, please adjust pieces in the following places: {}'.format(self.diffs)
+            if plot:
+                plot_array(self.board_to_compare)
+
+            raw_input('Press any key to check again')
+            self.board_to_compare = getRepresentation(self.boundaries, get_frame())
+            move = self.compare_boards()
+
+        self.prev_board = self.board_to_compare
+
         if plot:
             plot_array(self.board_to_compare)
+
         print self.board_to_compare
         return move
 
@@ -71,13 +80,19 @@ class Compvision():
             print 'Move is false'
             return False
 
+
+    def set_diffs(self, diff_index):
+        self.diffs = []
+        for i in range(len(diff_index[0])):
+            self.diffs.append( chr(diff_index[1][i] + 97) + str(8 - diff_index[0][i]))
+
     def compare_boards(self):
         if np.allclose(self.prev_board, self.board_to_compare):
             print 'The two boards are the same'
             return False
         else:
             diff_index = np.where(self.prev_board != self.board_to_compare)
-
+            self.set_diffs(diff_index)
             if len(diff_index[0]) == 2:
                 color_val_from = self.board_to_compare[diff_index[0][0]][diff_index[1][0]]
                 color_val_to = self.board_to_compare[diff_index[0][1]][diff_index[1][1]]
@@ -101,7 +116,7 @@ class Compvision():
                     print 'An error may have occured'
 
             else:
-                print 'An error occured, Please check that the pieces are standing correct'
+                pass
             return False
 
 
@@ -183,11 +198,11 @@ if __name__ == '__main__':
     #7: Castling black
         #7: Castling queens side
         #8: Castling kings side
-#    for i in range(1,8):
-#        test(i)
-#    print 'All tests passed'
+    #for i in range(1,8):
+    #    test(i)
+    #print 'All tests passed'
 
-    c = Compvision()
+    c = Compvision(plot=True)
     while True:
-        msg = raw_input('Press any button')
+        msg = raw_input('Do your move, punk')
         print c.get_move(plot=True)
