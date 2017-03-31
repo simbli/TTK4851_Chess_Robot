@@ -143,16 +143,11 @@ def hack_corners4(corners):
             new_board[i, j, 0] = np.int(corners[cornersLength - (internalCorners*(j+1)-i-1)][0][0])
             new_board[i, j, 1] = np.int(corners[cornersLength - (internalCorners*(j+1)-i-1)][0][1])
     return new_board
+
 def draw_internal_corners(image, corners):
     for c in corners:
         cv2.drawChessboardCorners(image, (7,7), c, False)
         show_image(image)
-
-def removeIntensities(image, th):
-    for i in range(image.shape[0]):
-        for j in range(image.shape[1]):
-            if image[i,j] > th:
-                image[i,j] = th
 
 
 def saveToFile(filename, boundaries):
@@ -161,40 +156,31 @@ def saveToFile(filename, boundaries):
 def getFromFile(filename):
     return np.load(filename)
 
-def calibrate():
+def calibrate(calib_frame=None):
     calibration_filename = 'computervision/boundaries.npy'
-    meanMatrix_filename = 'computervision/meanMatrix.npy'
     if os.path.isfile(calibration_filename):
         print 'Calibration file found, using stored'
-        meanMatrix = getFromFile(meanMatrix_filename)
-        print meanMatrix
-        return getFromFile(calibration_filename), meanMatrix
-    if os.path.isfile(meanMatrix_filename):
-        print 'Mean Matrix file found, using stored'
-
+        return getFromFile(calibration_filename)
     else:
         calibrated = False
         while not calibrated:
-            frame = get_frame()
-            found, corners = cv2.findChessboardCorners(frame, (7,7))#, flags=cv2.cv.CV_CALIB_CB_ADAPTIVE_THRESH)
+            if calib_frame is None:
+                frame = get_frame()
+            else:
+                frame = calib_frame
+            found, corners = cv2.findChessboardCorners(frame, (7,7))
             try:
                 cornersLength = len(corners)
             except:
                 cornersLength = 0
-
-            if cornersLength == 0:
-                print 'Trying to calibrate, found {} of 64 corners'.format(cornersLength)
-            else:
-                print 'Trying to calibrate, found {} of 64 corners'.format(cornersLength + 15)
+            print 'Trying to calibrate, found {} of 49 internal corners'.format(cornersLength)
 
             if found and len(corners) == 49:
                 calibrated = True
                 boundaries = createBoardMatrix(frame)
-                mean_matrix = get_mean_matrix(frame, boundaries)
         print 'Calibration complete, saving calibration file'
-        saveToFile('computervision/meanMatrix', mean_matrix)
         saveToFile('computervision/boundaries', boundaries)
-        return boundaries, mean_matrix
+        return boundaries
 
 def getCentroid(contour):
     M = cv2.moments(contour)
@@ -202,96 +188,12 @@ def getCentroid(contour):
     cy = int(M['m01']/(M['m00'] + settings.EPSILON))
     return cx, cy
 
-def checkSquareForContours(image, board, row, col, meanColor):
-    cutoff = settings.CUTOFF
-    torow = int(max(board[row][col][0], board[row][col+1][0])) - cutoff
-    fromrow = int(min(board[row+1][col][0], board[row+1][col+1][0])) + cutoff
-    tocol = int(max(board[row][col][1], board[row+1][col][1])) - cutoff
-    fromcol = int(min(board[row][col+1][1], board[row+1][col+1][1])) + cutoff
-    cropped = image[fromcol:tocol, fromrow:torow]
-    res = findContour(cropped, row, col, meanColor)
-    return res
-
-def get_mean_matrix(image, board):
-    mean_matrix = np.zeros((8,8))
-    cutoff = settings.CUTOFF
-    for row in range(8):
-        for col in range(8):
-            torow = int(max(board[row][col][0], board[row][col+1][0])) - cutoff
-            fromrow = int(min(board[row+1][col][0], board[row+1][col+1][0])) + cutoff
-            tocol = int(max(board[row][col][1], board[row+1][col][1])) - cutoff
-            fromcol = int(min(board[row][col+1][1], board[row+1][col+1][1])) + cutoff
-            cropped = image[fromcol:tocol, fromrow:torow]
-            mean_matrix[row,col] = find_color_mean(cropped)
-    return mean_matrix
-
 def find_color_mean(image):
     return np.mean(image)
 
 def show_image(image):
     cv2.imshow('', image)
     cv2.waitKey(0)
-
-
-def findChesspieceColor(image, contours, row, col, meanColor):
-    img2 = image.copy()
-    i = 0
-    size = settings.COLOR_MEAN_MASK_SIZE
-    for contour in contours:
-        (x,y,w,h) = cv2.boundingRect(contour)
-        i+=1
-        if w < settings.W_MAX and w > settings.W_MIN and h < settings.H_MAX and h > settings.H_MIN:
-            new_mean = find_color_mean(image)
-            #cx, cy = getCentroid(contour)
-            cx = np.round(image.shape[0]/2)
-            cy = np.round(image.shape[1]/2)
-            l = []
-            for j in range(-(size-1)/2,(size-1)/2 + 1):
-                for k in range(-(size-1)/2,(size-1)/2 + 1):
-                    #cv2.drawContours(img2, contour, -1, (0,255,0), 3)
-                    #show_image(img2)
-                    try:
-                        val = image[cx+j,cy+k]
-                        l.append(val)
-                    except:
-                        pass
-            mean_val = np.mean(l)
-            median_val = np.median(l)
-            print 'Original color: {}, Median val: {} new_mean: {}'.format(meanColor, median_val, new_mean)
-            if median_val < settings.TH_BLACK_WHITE:
-                return 2
-            else:
-                return 1
-    if i != 1 or 2:
-        return 0
-
-def get_median(image, contours, row, col):
-    i = 0
-    size = settings.COLOR_MEAN_MASK_SIZE
-    for contour in contours:
-        (x,y,w,h) = cv2.boundingRect(contour)
-        i+=1
-        if w < settings.W_MAX and w > settings.W_MIN and h < settings.H_MAX and h > settings.H_MIN:
-            cx = np.round(image.shape[0]/2)
-            cy = np.round(image.shape[1]/2)
-            l = []
-            for j in range(-(size-1)/2,(size-1)/2 + 1):
-                for k in range(-(size-1)/2,(size-1)/2 + 1):
-                    try:
-                        val = image[cx+j,cy+k]
-                        l.append(val)
-                    except:
-                        pass
-            mean_val = np.mean(l)
-            median_val = np.median(l)
-            return median_val
-
-def getHist(image):
-    vals = image.mean(axis=2).flatten()
-    # plot histogram with 255 bins
-    b, bins, patches = plt.hist(vals, 255)
-    plt.xlim([0,255])
-    plt.show()
 
 def preprocess(image):
     #th = 200
@@ -302,42 +204,94 @@ def preprocess(image):
     return image
 
 
-def findContour(image, row, col, meanColor):
-    #show_image(image)
-    canny = cv2.Canny(image, settings.CANNY_LOWER, settings.CANNY_HIGHER)#, L2gradient=True)
-    contours = cv2.findContours(canny, cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-    contours = contours[0]
-    return findChesspieceColor(image, contours, row, col, meanColor)
+#This function will not work well with only white or black, but that is rarely the case
+def calcThreshold(median_values):
+    T_init = settings.T_INIT
+    dt = settings.DT
+    T_prev = 0
+    T = T_init
+    while np.abs(T - T_prev) > dt:
+        m1 = np.mean(median_values[median_values > T])
+        m2 = np.mean(median_values[median_values <= T])
+        T_prev = T
+        T = (m1 + m2) / 2.0
+    return T
 
-def getRepresentation(boundaries, image, meanMatrix):
+def classifyPieceColor(intensities, representation, th):
+    for i in range(8):
+        for j in range(8):
+            if representation[i,j] != 0:
+                if intensities[i,j] <= th:
+                    representation[i,j] = 2
+                else:
+                    representation[i,j] = 1
+    return representation
+
+
+
+def getRepresentation(image, boundaries):
     N_SQUARES = settings.CHESSBOARD_SIZE
-    #Move preprocessing on each square
-
+    #Preprocess image as whole
     image = preprocess(image)
-    mat = np.zeros((N_SQUARES,N_SQUARES))
+    #Split image into 64 squares
+    intensities = np.zeros((N_SQUARES, N_SQUARES))
+    representation = np.zeros((N_SQUARES, N_SQUARES))
+    #get if there is a piece in the square and what the median/mean intensity of the middle is
+    median_list = []
     for i in range(N_SQUARES):
         for j in range(N_SQUARES):
-            mat[i,j] = checkSquareForContours(image, boundaries, i, j, meanMatrix[i,j])
-    return mat
+            square = getCroppedSquare(image, boundaries, i, j)
+            isPiece, medianVal = findChessPieceInSquare(square)
+            if isPiece:
+                intensities[i,j] = medianVal
+                representation[i,j] = 1
+                median_list.append(medianVal)
 
-def set_threshold(image, contours):
-    piece_list = []
-    for i in range(2):
-        for j in range(8):
-            piece_list.append(get_median(image, contours, i, j))
+    median_list = np.asarray(median_list)
+    th = calcThreshold(median_list)
+    representation = classifyPieceColor(intensities, representation, th)
+    return representation
 
-    for i in range(6,8):
-        for j in range(8):
-            piece_list.append(get_median(image, contours, i, j))
+def getCroppedSquare(image, boundaries, row, col):
+    cutoff = settings.CUTOFF
+    torow = int(max(boundaries[row][col][0], boundaries[row][col+1][0])) - cutoff
+    fromrow = int(min(boundaries[row+1][col][0], boundaries[row+1][col+1][0])) + cutoff
+    tocol = int(max(boundaries[row][col][1], boundaries[row+1][col][1])) - cutoff
+    fromcol = int(min(boundaries[row][col+1][1], boundaries[row+1][col+1][1])) + cutoff
+    cropped = image[fromcol:tocol, fromrow:torow]
+    return cropped
 
-    thresh = np.median(piece_list)
-    print "Optimal threshold is: {}".format(thresh)
-    return thresh
+def findChessPieceInSquare(square_image):
+    canny = cv2.Canny(square_image, settings.CANNY_LOWER, settings.CANNY_HIGHER)#, L2gradient=True)
+    contours = cv2.findContours(canny, cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    contours = contours[0]
+    i = 0
+    size = settings.COLOR_MEAN_MASK_SIZE
+    for contour in contours:
+        (x,y,w,h) = cv2.boundingRect(contour)
+        i+=1
+        #Check if contour is right size
+        if w < settings.W_MAX and w > settings.W_MIN and h < settings.H_MAX and h > settings.H_MIN:
+            cx = np.round(square_image.shape[0]/2)
+            cy = np.round(square_image.shape[1]/2)
+            l = []
+            #Check neighbourhood to get median value of middle of square
+            for j in range(-(size-1)/2,(size-1)/2 + 1):
+                for k in range(-(size-1)/2,(size-1)/2 + 1):
+                    try:
+                        val = square_image[cx+j,cy+k]
+                        l.append(val)
+                    except:
+                        pass
+            median_val = np.median(l)
+            return True, median_val
+    if i != 1 or 2:
+        return False, None
 
 def openAndInitializeImage(filename):
     image = cv2.imread(filename, 1)
-    image = cv2.GaussianBlur(image, (7,7),0)
-    image = cv2.medianBlur(image, 7)
+    #image = cv2.GaussianBlur(image, (7,7),0)
+    #image = cv2.medianBlur(image, 7)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     return image
 
@@ -350,7 +304,7 @@ if __name__ == '__main__':
     chessboard_image = openAndInitializeImage(chessboard_image_filename)
     boundaries = calibrate(calibration_image)
 
-    res = getRepresentation(boundaries, chessboard_image)
+    res = getRepresentation(chessboard_image, boundaries)
     try:
         from plot import plot_array
         plot_array(res)
