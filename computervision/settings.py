@@ -7,8 +7,7 @@ MAT_SIZE = 9
 EPSILON = 1e-9
 
 
-#Parameters for initializing thresholding.
-T_INIT = 90 
+#Parameters for thresholding.
 DT = 0.1
 
 

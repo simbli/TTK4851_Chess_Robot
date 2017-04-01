@@ -206,10 +206,12 @@ def preprocess(image):
 
 #This function will not work well with only white or black, but that is rarely the case
 def calcThreshold(median_values):
-    T_init = settings.T_INIT
+    median_max = np.max(median_values)
+    median_min = np.min(median_values)
+    midpoint = (median_max + median_min) / 2
     dt = settings.DT
     T_prev = 0
-    T = T_init
+    T = midpoint
     while np.abs(T - T_prev) > dt:
         m1 = np.mean(median_values[median_values > T])
         m2 = np.mean(median_values[median_values <= T])
