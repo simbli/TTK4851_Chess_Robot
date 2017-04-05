@@ -16,9 +16,8 @@ def findSquareSize(corners):
 
 def createBoardMatrix(frame):
     found, corners = cv2.findChessboardCorners(frame,(settings.INTERNAL_CORNERS,settings.INTERNAL_CORNERS))
-    #draw_internal_corners(frame.copy(), corners)
     sorted_corners = sort_corners(corners)
-    #check_order(frame, sorted_corners)
+    #order(frame, sorted_corners)
     midPixelIndex = 24
     midPixelX = corners[midPixelIndex][0][0]
     midPixelY = corners[midPixelIndex][0][1]
@@ -94,14 +93,15 @@ def sort_corners(corners):
         if startJ < centerJ:
             return hack_corners3(corners)
         else:
-            return hack_corners4(corners)
+            return hack_corners2(corners)
     else:
         if startJ < centerJ:
-            return hack_corners2(corners)
+            return hack_corners4(corners)
         else:
             return hack_corners1(corners)
 
 def hack_corners1(corners):
+    print "using hack_corners1"
     new_board = np.zeros((settings.INTERNAL_CORNERS,settings.INTERNAL_CORNERS,2))
     internalCorners = 7
     cornersLength = 48
@@ -114,6 +114,7 @@ def hack_corners1(corners):
 #May need these functions
 
 def hack_corners2(corners):
+    print "using hack_corners2"
     new_board = np.zeros((settings.INTERNAL_CORNERS,settings.INTERNAL_CORNERS,2))
     internalCorners = 7
     cornersLength = 48
@@ -124,6 +125,7 @@ def hack_corners2(corners):
     return new_board
 
 def hack_corners3(corners):
+    print "using hack_corners3"
     new_board = np.zeros((settings.INTERNAL_CORNERS,settings.INTERNAL_CORNERS,2))
     internalCorners = 7
     cornersLength = 48
@@ -135,6 +137,7 @@ def hack_corners3(corners):
 
 
 def hack_corners4(corners):
+    print "using hack_corners4"
     new_board = np.zeros((settings.INTERNAL_CORNERS,settings.INTERNAL_CORNERS,2))
     internalCorners = 7
     cornersLength = 48
@@ -196,9 +199,7 @@ def show_image(image):
     cv2.waitKey(0)
 
 def preprocess(image):
-    #th = 200
     #image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    #removeIntensities(image, th)
     image = cv2.GaussianBlur(image, (settings.GAUSSIAN_MASK_SIZE, settings.GAUSSIAN_MASK_SIZE),0)
     image = cv2.medianBlur(image, settings.MEDIAN_MASK_SIZE)
     return image
@@ -206,34 +207,42 @@ def preprocess(image):
 
 #This function will not work well with only white or black, but that is rarely the case
 def calcThreshold(median_values):
-    median_max = np.max(median_values)
-    median_min = np.min(median_values)
-    midpoint = (median_max + median_min) / 2
-    dt = settings.DT
-    T_prev = 0
-    T = midpoint
-    while np.abs(T - T_prev) > dt:
-        m1 = np.mean(median_values[median_values > T])
-        m2 = np.mean(median_values[median_values <= T])
-        T_prev = T
-        T = (m1 + m2) / 2.0
-    return T
+    if len(median_values) != 0:
+        median_max = np.max(median_values)
+        median_min = np.min(median_values)
+        print median_max
+        print median_min
+        midpoint = (median_max + median_min) / 2
+        dt = settings.DT
+        T_prev = 0
+        T = midpoint
+        while np.abs(T - T_prev) > dt:
+            m1 = np.mean(median_values[median_values > T])
+            m2 = np.mean(median_values[median_values <= T])
+            T_prev = T
+            T = (m1 + m2) / 2.0
+        return T
+    else:
+        return 0
 
 def classifyPieceColor(intensities, representation, th):
     for i in range(8):
         for j in range(8):
-            if representation[i,j] != 0:
+            if representation[i,j]:
                 if intensities[i,j] <= th:
                     representation[i,j] = 2
-                else:
+                elif intensities[i,j] > th:
                     representation[i,j] = 1
+                else:
+                    print "what"
+
     return representation
 
 
 
 def getRepresentation(image, boundaries):
     N_SQUARES = settings.CHESSBOARD_SIZE
-    #Preprocess image as whole
+    #Preprocess image as wholes
     image = preprocess(image)
     #Split image into 64 squares
     intensities = np.zeros((N_SQUARES, N_SQUARES))
@@ -246,7 +255,7 @@ def getRepresentation(image, boundaries):
             isPiece, medianVal = findChessPieceInSquare(square)
             if isPiece:
                 intensities[i,j] = medianVal
-                representation[i,j] = 1
+                representation[i,j] = True
                 median_list.append(medianVal)
 
     median_list = np.asarray(median_list)
@@ -264,6 +273,7 @@ def getCroppedSquare(image, boundaries, row, col):
     return cropped
 
 def findChessPieceInSquare(square_image):
+
     canny = cv2.Canny(square_image, settings.CANNY_LOWER, settings.CANNY_HIGHER)#, L2gradient=True)
     contours = cv2.findContours(canny, cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     contours = contours[0]

@@ -25,23 +25,22 @@ class Compvision():
     #Initialize with image of first board
     def __init__(self, plot=False):
         self.diffs = []
-        self.boundaries, self.meanMatrix = calibrate()
+        self.boundaries = calibrate()
         raw_input('Calibration is complete, please put chesspieces to their positions, then press any key')
 
         initialBoard = createInitialBoardMatrix()
         frame = get_frame()
-        currentBoard = getRepresentation(self.boundaries, frame, self.meanMatrix)
+        currentBoard = getRepresentation(frame, self.boundaries)
         while not np.array_equal(initialBoard, currentBoard):
             print 'Could not detect correct setup, try again'
             if plot:
                 plot_array(currentBoard)
             print currentBoard
-            currentBoard = getRepresentation(self.boundaries, get_frame(), self.meanMatrix)
+            currentBoard = getRepresentation(get_frame(), self.boundaries)
             time.sleep(1)
         self.prev_board = currentBoard
         self.board_to_compare = None
 
-        pass
     def run(self):
         while True:
             self.board_to_compare = getRepresentation(self.boundaries, get_frame())
@@ -53,15 +52,16 @@ class Compvision():
 
     def get_move(self, plot=False):
         move = False
-        self.board_to_compare = getRepresentation(self.boundaries, get_frame(), self.meanMatrix)
+        self.board_to_compare = getRepresentation(get_frame(), self.boundaries)
         move = self.compare_boards()
         while not move:
             print 'An error occured, please adjust pieces in the following places: {}'.format(self.diffs)
+            print self.board_to_compare
             if plot:
                 plot_array(self.board_to_compare)
 
             raw_input('Press any key to check again')
-            self.board_to_compare = getRepresentation(self.boundaries, get_frame(), self.meanMatrix)
+            self.board_to_compare = getRepresentation(get_frame(), self.boundaries)
             move = self.compare_boards()
 
         self.prev_board = self.board_to_compare

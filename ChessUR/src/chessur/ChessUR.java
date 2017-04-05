@@ -13,7 +13,10 @@ import socket.URsocket;
 public class ChessUR {
 
     //Set the ip-adress and port to the UR3
-    static String serverUR = "192.168.0.3";
+    static String serverUR = "192.168.0.5";
+    //static String serverUR = "169.254.192.104";
+
+    //static String serverUR = "fe80::4c3c:5387:8215:9e3b/64";
     static int portUR = 30002;
 
     public static void main(String[] args) throws InterruptedException {
