@@ -210,8 +210,6 @@ def calcThreshold(median_values):
     if len(median_values) != 0:
         median_max = np.max(median_values)
         median_min = np.min(median_values)
-        print median_max
-        print median_min
         midpoint = (median_max + median_min) / 2
         dt = settings.DT
         T_prev = 0

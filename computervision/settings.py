@@ -2,7 +2,7 @@
 
 #Camera Parameters
 CAMERA_CHANNEL = 0
-CAMERA_SLEEP_TIME = 0.5
+CAMERA_SLEEP_TIME = 0.4
 
 #Sizes
 CHESSBOARD_SIZE = 8
@@ -17,7 +17,7 @@ DT = 0.1
 #Filtering sizes
 MEDIAN_MASK_SIZE = 3 #How large median filtering
 GAUSSIAN_MASK_SIZE = 3 #How large gaussian blur filtering
-COLOR_MEAN_MASK_SIZE = 5 #How large mask we use to find piece color
+COLOR_MEAN_MASK_SIZE = 7 #How large mask we use to find piece color
 
 #Edge detection parameters
 CUTOFF = 5 #How much of the corners of the squares are cut off

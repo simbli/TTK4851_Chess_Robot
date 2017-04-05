@@ -67,18 +67,16 @@ def main():
 		#get move made by the player from computer vision
 		move = raw_input('White player: take your move, then press Enter')
 		move = c.get_move()
-		if (True):
+		if move:
 			print "White players move: {}".format(move)
 			#Makes the move on the board
 			ai.set_move(move)
 
 			#calculate robot move with ai
 			moves = ai.get_move_stockfish()
-			#raw_input('Black player: take your move, then press Enter')
 			#send move to robot
 			send_move(moves)
-			move = c.get_move()
-			print "Black players move: {}".format(move)
+			print "Computervision detected Black players move: {}".format(c.get_move())
 
 if __name__ == "__main__":
 	main()

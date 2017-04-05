@@ -35,8 +35,8 @@ class Compvision():
             print 'Could not detect correct setup, try again'
             if plot:
                 plot_array(currentBoard)
-            print currentBoard
             currentBoard = getRepresentation(get_frame(), self.boundaries)
+            print currentBoard
             time.sleep(1)
         self.prev_board = currentBoard
         self.board_to_compare = None
@@ -46,7 +46,6 @@ class Compvision():
             self.board_to_compare = getRepresentation(self.boundaries, get_frame())
             plot_array(self.board_to_compare)
             move = self.get_move()
-            print move
             name = raw_input('Press enter to continue')
             self.prev_board = self.board_to_compare
 
@@ -56,11 +55,9 @@ class Compvision():
         move = self.compare_boards()
         while not move:
             print 'An error occured, please adjust pieces in the following places: {}'.format(self.diffs)
-            print self.board_to_compare
             if plot:
                 plot_array(self.board_to_compare)
-
-            raw_input('Press any key to check again')
+            #raw_input('Press any key to check again')
             self.board_to_compare = getRepresentation(get_frame(), self.boundaries)
             move = self.compare_boards()
 
@@ -68,8 +65,6 @@ class Compvision():
 
         if plot:
             plot_array(self.board_to_compare)
-
-        print self.board_to_compare
         return move
 
     def check_if_move_is_correct(self, move_to_check):
