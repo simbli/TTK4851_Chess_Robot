@@ -30,7 +30,7 @@ public class RocketfarmUpload {
 //        String scriptFile = "handshake_v3.script"; // ball_pull_v2  handshake_v2
 
         String filePath = "F:/GitHub/EiT_chess_robot/URscript/newGripper/";
-//       String scriptFile = "palletTest.script"; 
+//       String scriptFile = "palletTest.script";
 //        String scriptFile = "pickUpTest.script";
 //        String scriptFile = "xyMove.script";
          String scriptFile = "xyMoveGripper45deg.script";
@@ -40,7 +40,7 @@ public class RocketfarmUpload {
 
 //        Scanner input = new Scanner(System.in);
 //        String choice;
-        String serverName = "192.168.0.3";
+        String serverName = "192.168.0.5";
         int port = 30002;
 //        int port = 63350;
 
@@ -224,7 +224,7 @@ public class RocketfarmUpload {
 //                    }
 //                    for (int i = 95; i <= 103; i++) {
 //                        System.out.println("Target joint " + i + " " + bb.getDouble(i));
-//                        
+//
 //                    }
 //                    Thread.sleep(3000);
                         //System.out.println("joint 0 info " + bb.getLong(39));
@@ -237,7 +237,7 @@ public class RocketfarmUpload {
 //                    tid = tid * 256 + bb.get(45);
 //                    tid = tid * 256 + bb.get(46);
 //                    System.out.println(" time " + tid);
-//                  
+//
 //                    System.out.println("q target 2 " + bb.getLong(28));
 //                    System.out.println("q target 3 " + bb.getLong(36));
 //                    System.out.println("q target 4 " + bb.getLong(44));
@@ -249,7 +249,7 @@ public class RocketfarmUpload {
                         //System.out.println("****");
                         // System.out.println(fromServer.read());
 //               System.out.println("***");
-//                
+//
 //                System.out.println(in.readInt());
 //                for (int i = 0; i < 95; i++) {
 //                    System.out.println(in.readDouble());

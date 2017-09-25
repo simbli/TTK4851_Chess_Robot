@@ -110,7 +110,7 @@ class Compvision():
                     return 'e8c8'
                 else:
                     print 'An error may have occured'
-
+                    return False
             else:
                 pass
             return False

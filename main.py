@@ -3,6 +3,7 @@ import ai.ai as artint
 import Tkinter
 import time
 import computervision.cv as cv
+import pygame
 
 GUI = False
 
@@ -56,16 +57,21 @@ def update_label(label_text):
 
 
 def main():
+	pygame.mixer.init()
+	pygame.mixer.music.load("beep-07.wav")
+	#print "Foer move"
+	send_move(['h3h4'])
+	#print "etter move"
 	c = cv.Compvision()
 	ai = artint.AI()
 	if GUI:
 		createGUI()
 
 
-
 	while not ai.game_over():
+		pygame.mixer.music.play()
 		#get move made by the player from computer vision
-		move = raw_input('White player: take your move, then press Enter')
+		dummy = raw_input('White player: take your move, then press Enter')
 		move = c.get_move()
 		if move:
 			print "White players move: {}".format(move)

@@ -169,6 +169,7 @@ def calibrate(calib_frame=None):
         while not calibrated:
             if calib_frame is None:
                 frame = get_frame()
+                show_image(frame)
             else:
                 frame = calib_frame
             found, corners = cv2.findChessboardCorners(frame, (7,7))
@@ -313,7 +314,6 @@ if __name__ == '__main__':
     calibration_image = openAndInitializeImage(calibration_image_filename)
     chessboard_image = openAndInitializeImage(chessboard_image_filename)
     boundaries = calibrate(calibration_image)
-
     res = getRepresentation(chessboard_image, boundaries)
     try:
         from plot import plot_array

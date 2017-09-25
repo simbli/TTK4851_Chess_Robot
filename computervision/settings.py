@@ -1,7 +1,7 @@
 #File using the most common variables for easier tuning
 
 #Camera Parameters
-CAMERA_CHANNEL = 0
+CAMERA_CHANNEL = 1
 CAMERA_SLEEP_TIME = 0.4
 
 #Sizes
